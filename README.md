@@ -1,4 +1,4 @@
-# Nanopore AMR and Species Identification Pipeline
+# Nanopore Species Identification and AMR Gene Annotation Pipeline
 
 A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species and AMR genes from Nanopore whole genome sequencing (WGS) data.
 
