@@ -1,8 +1,8 @@
-**Nanopore AMR and Species Identification Pipeline**
+#Nanopore AMR and Species Identification Pipeline
 
 A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species and AMR genes from Nanopore whole genome sequencing (WGS) data.
 
-**Features**
+##Features
 1. Modular DSL2 pipeline with process-specific scripts
 
 2. Species classification via GTDB-Tk, Kraken2, FastANI
@@ -15,7 +15,7 @@ A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species
 
 6. Reproducible via environment.yml
 
-**Quickstart**
+##Quickstart
 ```
 # Option 2: Clone and enter
 git clone https://github.com/yourusername/nanopore_amr_pipeline.git
