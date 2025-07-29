@@ -17,7 +17,7 @@ A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species
 
 ## Quickstart
 ```
-# Option 2: Clone and enter
+# Option 1: Clone and enter
 git clone https://github.com/yourusername/nanopore_amr_pipeline.git
 cd nanopore_amr_pipeline
 
