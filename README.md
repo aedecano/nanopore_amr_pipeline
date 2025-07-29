@@ -3,17 +3,17 @@
 A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species and AMR genes from Nanopore whole genome sequencing (WGS) data.
 
 **Features**
-📦 Modular DSL2 pipeline with process-specific scripts
+1. Modular DSL2 pipeline with process-specific scripts
 
-🧪 Species classification via GTDB-Tk, Kraken2, FastANI
+2. Species classification via GTDB-Tk, Kraken2, FastANI
 
-🛡️ AMR gene detection using Abricate (ResFinder only)
+3. AMR gene detection using Abricate (ResFinder only)
 
-🔍 Summary report with visual output (barplots, CSVs)
+4. Summary report with visual output (barplots, CSVs)
 
-🧪 GitHub CI-tested with dummy data
+5. GitHub CI-tested with dummy data
 
-📦 Reproducible via environment.yml
+6. Reproducible via environment.yml
 
 **Quickstart**
 ```
