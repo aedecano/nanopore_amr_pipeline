@@ -244,6 +244,25 @@ process NANOPLOTYPER {
     """
 }
 
+process FASTANI {
+    label 'fastani'
+    tag {"FastANI ${uuid} contigs"}
+    
+    publishDir "$params.outdir/fastani", mode: 'copy'
+
+    input:
+    tuple val(uuid), path(contigs) 
+    
+    output:
+    path ("${uuid}_fastani_report.txt")
+    
+    script:
+    
+    """
+    fastANI -q ${contigs} -r ${ref}.fasta -o ${uuid}_fastani_report.txt
+    """
+}
+
 process GTDBTYPER {
     label 'gtdbtyper'
     tag {"GTDB-Tk classification ${uuid} contigs"}
