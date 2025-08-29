@@ -21,7 +21,7 @@ A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species
 git clone https://github.com/yourusername/nanopore_amr_pipeline.git
 cd nanopore_amr_pipeline
 
-# Options 2: Create conda env
+# Option 2: Create conda env
 mamba env create -f environment.yml
 conda activate nanopore_amr
 

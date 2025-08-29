@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 /* 
-A pipeline for de novo assembly and AMR annotation of Nanopore long read libraries
+A pipeline for de novo assembly, specied ID and AMR annotation of Nanopore long read libraries
 
 QC
 
