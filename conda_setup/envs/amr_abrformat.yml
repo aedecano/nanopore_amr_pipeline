@@ -1,0 +1,7 @@
+name: amr_abrformat
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+- abricate

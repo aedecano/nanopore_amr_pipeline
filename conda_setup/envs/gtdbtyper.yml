@@ -1,0 +1,9 @@
+name: gtdbtyper
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+- gtdbtk
+- pplacer
+- fasttree

@@ -1,0 +1,7 @@
+name: phylogeny
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+- fasttree

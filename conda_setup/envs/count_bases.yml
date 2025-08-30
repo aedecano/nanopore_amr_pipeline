@@ -1,0 +1,7 @@
+name: count_bases
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+- seqtk
