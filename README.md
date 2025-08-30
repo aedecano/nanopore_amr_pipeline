@@ -15,13 +15,24 @@ A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species
 
 6. Reproducible via environment.yml
 
+## Workflow
+
+main.nf
+├── filter_reads.nf
+├── assemble_genome.nf
+├── classify_gtdb.nf
+├── classify_kraken.nf
+├── compute_fastani.nf
+├── detect_amr.nf
+└── summarize_results.nf
+
 ## Quickstart
 ```
 # Option 1: Clone and enter
 git clone https://github.com/yourusername/nanopore_amr_pipeline.git
 cd nanopore_amr_pipeline
 
-# Options 2: Create conda env
+# Option 2: Create conda env
 mamba env create -f environment.yml
 conda activate nanopore_amr
 
@@ -33,3 +44,9 @@ nextflow run main.nf \
   --fastani_db /path/to/fastani_db \
   --outdir results
 ```
+## Visualise results
+```
+Rscript scripts/visualize_results.R results/species_amr_summary.csv
+```
+## Expected Output
+
