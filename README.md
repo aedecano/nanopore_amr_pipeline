@@ -26,6 +26,26 @@ main.nf
 ├── detect_amr.nf
 └── summarize_results.nf
 
+## Usage
+
+- `nextflow.config` — maps each process label in your pipeline to a dedicated Conda env YAML.
+- `envs/*.yml` — one environment per label/tool.
+
+Run with the `conda` profile:
+```
+nextflow run nanopore.nf -profile conda -c ~/conda_setup/nextflow.config
+```
+
+## Notes
+- **Guppy** is not distributed on Bioconda due to licensing. The `guppy_basecall` env only provides Python.
+  Install Guppy from Oxford Nanopore and ensure `guppy_basecaller` is on your `PATH` when that process runs
+  (e.g., `export PATH=/opt/ont/guppy/bin:$PATH`), or bind-mount it in containers.
+- **GTDB-Tk** requires reference data (`GTDBTK_DATA_PATH`), and sometimes specific versions of `pplacer/fasttree`.
+- **Kraken2**/**GTDB-Tk**/**AMRFinderPlus** require external databases—configure paths in your Nextflow params.
+- If any process uses additional commands not captured by the label, add them to the corresponding env YAML.
+- You can switch to a shared env by pointing multiple labels to the same YAML in `nextflow.config`.
+
+
 ## Quickstart
 ```
 # Option 1: Clone and enter
