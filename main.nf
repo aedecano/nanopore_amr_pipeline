@@ -57,11 +57,12 @@ params.mlstdb = ""
 params.prefix = ""
 params.blastn = " "
 params.mlst_loci = ""
-params.kraken2_db=""
+params.kraken2_db= ""
+
 
 
 workflow assembly_amr_pangenome {
-       Channel.fromFilePairs(params.reads, checkIfExists: true)
+       Channel.fromPath(params.reads, checkIfExists: true)
            .map{it}
            //.view()
            .set{reads}
