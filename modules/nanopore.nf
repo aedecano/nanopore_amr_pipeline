@@ -17,54 +17,82 @@ QC of raw reads
 process BASECALL_DORADO {
 
     label 'dorado basecall'
-    tag {"Dorado basecalling ${uuid} reads"}
+    tag {"Dorado basecalling ${sample_id} reads"}
     
-    publishDir "$params.outdir/basecalled", mode: 'copy'
+    publishDir "$params.outdir/basecalled_dorado", mode: 'copy'
+
+    label 'dorado basecall'
+    tag   "${sample_id}"
 
     input:
-    tuple val(uuid), path(reads) 
-    
+    tuple val(sample_id), path(raw_dir)
+
     output:
-    tuple val(uuid), path("${uuid}_fastq/${uuid}_1.fastq.gz"), path("${uuid}_fastq/${uuid}_2.fastq.gz")
-    
+    tuple val(sample_id), path("${sample_id}.bam")
+
+    publishDir "${params.outdir}/DORADO_BASECALL", mode: 'copy', overwrite: true
+
     script:
-    
     """
-    dorado dna_r9.4.1 -i ${reads} -o ${uuid}_fastq -t ${task.cpus} --device auto --bam_out ${uuid}_fastq/${uuid}.bam
+    dorado basecaller \\
+        --device ${params.dorado_device} \\
+        --emit-bam \\
+        --emit-moves \\
+        ${params.dorado_model} \\
+        ${raw_dir} \\
+        > ${sample_id}.bam
+    """
+}
+
+process BAM_TO_FASTQ {
+    label 'bam_to_fastq'
+    tag   "${sample_id}"
+
+    input:
+    tuple val(sample_id), path(bam)
+
+    output:
+    path "${sample_id}.fastq.gz"
+
+    publishDir "${params.outdir}/BAM_TO_FASTQ", mode: 'copy', overwrite: true
+
+    script:
+    """
+    samtools fastq -n -F 0x900 ${bam} | gzip -c > ${sample_id}.fastq.gz
     """
 }
 
 process BASECALL_GUPPY {
     label 'guppy basecall'
-    tag {"Guppy basecalling ${uuid} reads"}
+    tag {"Guppy basecalling ${sample_id} reads"}
     
     publishDir "$params.outdir/basecalled", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    tuple val(uuid), path("${uuid}_fastq/${uuid}_1.fastq.gz"), path("${uuid}_fastq/${uuid}_2.fastq.gz")
+    tuple val(sample_id), path("${sample_id}_fastq/${sample_id}_1.fastq.gz"), path("${sample_id}_fastq/${sample_id}_2.fastq.gz")
     
     script:
     
     """
-    guppy_basecaller -i ${reads} -s ${uuid}_fastq --flowcell FLO-MIN106 --kit SQK-LSK109 --num_callers ${task.cpus} --cpu_threads_per_caller 4 --barcode_kits EXP-NBD104 --trim_barcodes
+    guppy_basecaller -i ${reads} -s ${sample_id}_fastq --flowcell FLO-MIN106 --kit SQK-LSK109 --num_callers ${task.cpus} --cpu_threads_per_caller 4 --barcode_kits EXP-NBD104 --trim_barcodes
     """
 }
 
 
 process RAWFASTQC_SINGLE {
     label 'fastqc'
-    tag {"FastQC raw ${uuid} reads"}
+    tag {"FastQC raw ${sample_id} reads"}
     
     publishDir "$params.outdir/raw_fastqc", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    path ("${uuid}_fastqc/${uuid}.txt")
+    path ("${sample_id}_fastqc/${sample_id}.txt")
     
     script:
     
@@ -96,34 +124,34 @@ process MULTIQC_READS {
 
 process FILTLONG {
     label 'filtlong'
-    tag {"Filtlong ${uuid} reads"}
+    tag {"Filtlong ${sample_id} reads"}
     
     publishDir "$params.outdir/cleaned_reads", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    tuple val(uuid), path("${uuid}_filtlong.fastq")
+    tuple val(sample_id), path("${sample_id}_filtlong.fastq")
     
     script:
     
     """
-    filtlong --min_length 1000 --keep_percent 90 ${reads} > ${uuid}_filtlong.fastq
+    filtlong --min_length 1000 --keep_percent 90 ${reads} > ${sample_id}_filtlong.fastq
     """
 }
 
 process CLEANFASTQC_SINGLE {
     label 'fastqc'
-    tag {"FastQC cleaned ${uuid} reads"}
+    tag {"FastQC cleaned ${sample_id} reads"}
     
     publishDir "$params.outdir/cleaned_fastqc", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    path ("${uuid}_clean_fastqc/${uuid}.txt")
+    path ("${sample_id}_clean_fastqc/${sample_id}.txt")
     
     script:
     
@@ -151,250 +179,250 @@ process MULTIQC_CONTIGS {
 
 process ASSEMBLY {
     label 'assembly'
-    tag {"Assembly ${uuid} reads"}
+    tag {"Assembly ${sample_id} reads"}
     
     publishDir "$params.outdir/assemblies", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    tuple val(uuid), path("${uuid}_assembly/${uuid}_contigs.fasta")
+    tuple val(sample_id), path("${sample_id}_assembly/${sample_id}_contigs.fasta")
     
     script:
     
     """
-    flye --nano-raw ${reads} --out-dir ${uuid}_assembly --threads ${task.cpus} --genome-size 5m
+    flye --nano-raw ${reads} --out-dir ${sample_id}_assembly --threads ${task.cpus} --genome-size 5m
     """
 }
 
 process QUAST_FROM_READS {
     label 'quast'
-    tag {"QUAST from ${uuid} reads"}
+    tag {"QUAST from ${sample_id} reads"}
     
     publishDir "$params.outdir/quast_reads", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    path ("${uuid}_quast_report")
+    path ("${sample_id}_quast_report")
     
     script:
     
     """
-    quast.py ${reads} -o ${uuid}_quast_report -t ${task.cpus}
+    quast.py ${reads} -o ${sample_id}_quast_report -t ${task.cpus}
     """
 }   
 
 process QUAST_FROM_CONTIGS {
     label 'quast'
-    tag {"QUAST from ${uuid} contigs"}
+    tag {"QUAST from ${sample_id} contigs"}
     
     publishDir "$params.outdir/quast_contigs", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_quast_report")
+    path ("${sample_id}_quast_report")
     
     script:
     
     """
-    quast.py ${contigs} -o ${uuid}_quast_report -t ${task.cpus}
+    quast.py ${contigs} -o ${sample_id}_quast_report -t ${task.cpus}
     """
 }   
 
 process MEDAKA {
     label 'medaka'
-    tag {"Medaka polishing ${uuid} reads"}
+    tag {"Medaka polishing ${sample_id} reads"}
     
     publishDir "$params.outdir/polished_contigs", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads), path(contigs) 
+    tuple val(sample_id), path(reads), path(contigs) 
     
     output:
-    tuple val(uuid), path("${uuid}_polished/${uuid}_polished.fasta")
+    tuple val(sample_id), path("${sample_id}_polished/${sample_id}_polished.fasta")
     
     script:
     
     """
-    medaka_consensus -i ${reads} -d ${contigs} -o ${uuid}_polished -t ${task.cpus} -m r941_min_high_g360
+    medaka_consensus -i ${reads} -d ${contigs} -o ${sample_id}_polished -t ${task.cpus} -m r941_min_high_g360
     """
 }
 
 process NANOPLOTYPER {
     label 'nanoplot'
-    tag {"NanoPlot ${uuid} reads"}
+    tag {"NanoPlot ${sample_id} reads"}
     
     publishDir "$params.outdir/nanoplot", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    path ("${uuid}_nanoplot")
+    path ("${sample_id}_nanoplot")
     
     script:
     
     """
-    NanoPlot --fastq ${reads} -o ${uuid}_nanoplot --threads ${task.cpus}
+    NanoPlot --fastq ${reads} -o ${sample_id}_nanoplot --threads ${task.cpus}
     """
 }
 
 process FASTANI {
     label 'fastani'
-    tag {"FastANI ${uuid} contigs"}
+    tag {"FastANI ${sample_id} contigs"}
     
     publishDir "$params.outdir/fastani", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_fastani_report.txt")
+    path ("${sample_id}_fastani_report.txt")
     
     script:
     
     """
-    fastANI -q ${contigs} -r ${ref}.fasta -o ${uuid}_fastani_report.txt
+    fastANI -q ${contigs} -r ${ref}.fasta -o ${sample_id}_fastani_report.txt
     """
 }
 
 process GTDBTYPER {
     label 'gtdbtyper'
-    tag {"GTDB-Tk classification ${uuid} contigs"}
+    tag {"GTDB-Tk classification ${sample_id} contigs"}
     
     publishDir "$params.outdir/gtdbtk", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_gtdbtk_report.txt")
+    path ("${sample_id}_gtdbtk_report.txt")
     
     script:
     
     """
-    gtdbtk classify_wf --genome_dir . --out_dir ${uuid}_gtdbtk --cpus ${task.cpus}
-    cp ${uuid}_gtdbtk/gtdbtk.bac120.summary.tsv ${uuid}_gtdbtk_report.txt
+    gtdbtk classify_wf --genome_dir . --out_dir ${sample_id}_gtdbtk --cpus ${task.cpus}
+    cp ${sample_id}_gtdbtk/gtdbtk.bac120.summary.tsv ${sample_id}_gtdbtk_report.txt
     """
 }
 
 
 process AMR_PLM_FROM_CONTIGS {
     label 'amr_plm'
-    tag {"AMR Plasmid from ${uuid} contigs"}
+    tag {"AMR Plasmid from ${sample_id} contigs"}
     
     publishDir "$params.outdir/amr_plasmids_contigs", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_plasmid_report.txt")
+    path ("${sample_id}_plasmid_report.txt")
     
     script:
     
     """
-    plasmidfinder.py -i ${contigs} -o ${uuid}_plasmid_report -p /path/to/plasmidfinder_db -t 0.95 -l 0.6
+    plasmidfinder.py -i ${contigs} -o ${sample_id}_plasmid_report -p /path/to/plasmidfinder_db -t 0.95 -l 0.6
     """
 }
 
 process AMR_ABRFORMAT {
     label 'amr_abrformat'
-    tag {"AMR ABRicate from ${uuid} contigs"}
+    tag {"AMR ABRicate from ${sample_id} contigs"}
     
     publishDir "$params.outdir/amr_abricate_contigs", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_abricate_report.txt")
+    path ("${sample_id}_abricate_report.txt")
     
     script:
     
     """
-    abricate --db ncbi ${contigs} > ${uuid}_abricate_report.txt
+    abricate --db ncbi ${contigs} > ${sample_id}_abricate_report.txt
     """
 }
 
 process MOBTYPER {
     label 'mobtyper'
-    tag {"MOB-typer from ${uuid} contigs"}
+    tag {"MOB-typer from ${sample_id} contigs"}
     
     publishDir "$params.outdir/mobtyper_contigs", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_mobtyper_report.txt")
+    path ("${sample_id}_mobtyper_report.txt")
     
     script:
     
     """
-    mob_typer -i ${contigs} -o ${uuid}_mobtyper_report
+    mob_typer -i ${contigs} -o ${sample_id}_mobtyper_report
     """
 }
 
 process AMRFINDERPLUS {
     label 'amrfinderplus'
-    tag {"AMR Finder Plus from ${uuid} contigs"}
+    tag {"AMR Finder Plus from ${sample_id} contigs"}
     
     publishDir "$params.outdir/amrfinderplus_contigs", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_amrfinderplus_report.txt")
+    path ("${sample_id}_amrfinderplus_report.txt")
     
     script:
     
     """
-    amrfinder -n ${contigs} -o ${uuid}_amrfinderplus_report.txt --organism Clostridioides_difficile --plus
+    amrfinder -n ${contigs} -o ${sample_id}_amrfinderplus_report.txt --organism Clostridioides_difficile --plus
     """
 }
 
 process MLST_FROM_CONTIGS {
     label 'mlst'
-    tag {"MLST from ${uuid} contigs"}
+    tag {"MLST from ${sample_id} contigs"}
     
     publishDir "$params.outdir/mlst_contigs", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_mlst_report.txt")
+    path ("${sample_id}_mlst_report.txt")
     
     script:
     
     """
-    mlst ${contigs} > ${uuid}_mlst_report.txt
+    mlst ${contigs} > ${sample_id}_mlst_report.txt
     """
 }
 
 process PROKKA {
     label 'prokka'
-    tag {"Prokka annotation ${uuid} contigs"}
+    tag {"Prokka annotation ${sample_id} contigs"}
     
     publishDir "$params.outdir/prokka_annotations", mode: 'copy'
 
     input:
-    tuple val(uuid), path(contigs) 
+    tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${uuid}_prokka")
+    path ("${sample_id}_prokka")
     
     script:
     
     """
-    prokka --outdir ${uuid}_prokka --prefix ${uuid} --cpus ${task.cpus} ${contigs}
+    prokka --outdir ${sample_id}_prokka --prefix ${sample_id} --cpus ${task.cpus} ${contigs}
     """
 }
 
@@ -438,79 +466,79 @@ process PHYLOGENY {
 
 process KRAKEN2 {
     label 'kraken2'
-    tag {"Kraken2 classification ${uuid} reads"}
+    tag {"Kraken2 classification ${sample_id} reads"}
     
     publishDir "$params.outdir/kraken2", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    path ("${uuid}_kraken2_report.txt"), path("${uuid}_kraken2_output.txt")
+    path ("${sample_id}_kraken2_report.txt"), path("${sample_id}_kraken2_output.txt")
     
     script:
     
     """
-    kraken2 --db ${params.kraken2_db} --threads ${task.cpus} --report ${uuid}_kraken2_report.txt --output ${uuid}_kraken2_output.txt ${reads}
+    kraken2 --db ${params.kraken2_db} --threads ${task.cpus} --report ${sample_id}_kraken2_report.txt --output ${sample_id}_kraken2_output.txt ${reads}
     """
 }   
 
 process COUNT_BASES_CALLED {
     label 'count_bases'
-    tag {"Count bases called ${uuid} reads"}
+    tag {"Count bases called ${sample_id} reads"}
     
     publishDir "$params.outdir/base_counts", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads) 
+    tuple val(sample_id), path(reads) 
     
     output:
-    path ("${uuid}_base_count.txt")
+    path ("${sample_id}_base_count.txt")
     
     script:
     
     """
-    seqtk fqchk ${reads} | grep 'bases' > ${uuid}_base_count.txt
+    seqtk fqchk ${reads} | grep 'bases' > ${sample_id}_base_count.txt
     """
 }
 
 process GENOME_DEPTH {
     label 'genome_depth'
-    tag {"Genome depth ${uuid} reads"}
+    tag {"Genome depth ${sample_id} reads"}
     
     publishDir "$params.outdir/genome_depth", mode: 'copy'
 
     input:
-    tuple val(uuid), path(reads), path(contigs) 
+    tuple val(sample_id), path(reads), path(contigs) 
     
     output:
-    path ("${uuid}_genome_depth.txt")
+    path ("${sample_id}_genome_depth.txt")
     
     script:
     
     """
-    minimap2 -a -x map-ont ${contigs} ${reads} | samtools sort -o ${uuid}_sorted.bam
-    samtools index ${uuid}_sorted.bam
-    samtools depth ${uuid}_sorted.bam > ${uuid}_genome_depth.txt
+    minimap2 -a -x map-ont ${contigs} ${reads} | samtools sort -o ${sample_id}_sorted.bam
+    samtools index ${sample_id}_sorted.bam
+    samtools depth ${sample_id}_sorted.bam > ${sample_id}_genome_depth.txt
     """
 }
 
 process SUMMARY_BLASTN {
     label 'summary_blastn'
-    tag {"Summary BLASTN ${uuid} reads"}
+    tag {"Summary BLASTN ${sample_id} reads"}
     
     publishDir "$params.outdir/summary_blastn", mode: 'copy'
 
     input:
-    tuple val(uuid), path(blastn) 
+    tuple val(sample_id), path(blastn) 
     
     output:
-    path ("${uuid}_summary_blastn.txt")
+    path ("${sample_id}_summary_blastn.txt")
     
     script:
     
     """
-    awk -v OFS='\\t' '{print \$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12}' ${blastn} > ${uuid}_summary_blastn.txt
+    awk -v OFS='\\t' '{print \$1, \$2, \$3, \$4, \$5, \$6, \$7, \$8, \$9, \$10, \$11, \$12}' ${blastn} > ${sample_id}_summary_blastn.txt
     """
 }
 

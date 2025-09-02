@@ -49,6 +49,7 @@ Parameters
 #==============================================
 */
 
+params.fast5 = ""
 params.ref = ""
 params.reads = ""
 params.outdir = " "
@@ -59,6 +60,16 @@ params.blastn = " "
 params.mlst_loci = ""
 params.kraken2_db= ""
 
+workflow basecall_extractFQ {
+       Channel.fromPath(params.fast5, checkIfExists: true)
+           .map{it}
+           //.view()
+           .set{fast5s}
+       main:
+       BASECALL_DORADO(fast5s)
+       BAM_TO_FASTQ(BASECALL_DORADO.out.bam)
+       COUNT_BASES_CALLED(BAM_TO_FASTQ.out.fastq)
+}
 
 
 workflow assembly_amr_pangenome {
