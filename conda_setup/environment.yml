@@ -1,0 +1,16 @@
+name: amr_pipeline_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - abricate
+  - plasmidfinder
+  - ncbi-amrfinderplus
+  - flye
+  - seqtk
+  - dorado
+  - fastani
+  - fastqc
+  - filtlong
+  - samtools

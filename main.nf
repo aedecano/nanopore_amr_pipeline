@@ -52,11 +52,11 @@ Parameters
 params.fast5 = ""
 params.ref = ""
 params.reads = ""
-params.outdir = " "
-params.contigs = " "
+params.outdir = ""
+params.contigs = ""
 params.mlstdb = ""
 params.prefix = ""
-params.blastn = " "
+params.blastn = ""
 params.mlst_loci = ""
 params.kraken2_db= ""
 
@@ -66,7 +66,7 @@ workflow basecall_extractFQ {
            //.view()
            .set{fast5s}
        main:
-       BASECALL_DORADO(fast5s)
+       BASECALL_DORADO(fast5)
        BAM_TO_FASTQ(BASECALL_DORADO.out.bam)
        COUNT_BASES_CALLED(BAM_TO_FASTQ.out.fastq)
 }
