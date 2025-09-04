@@ -110,10 +110,10 @@ workflow amr_annotation {
     Channel
         .fromPath(pattern, checkIfExists: true)
         .map { f -> tuple(f.baseName, f) }   // (sample_id, path)
-        .set { contigs_ch }
+        .set { contigs }
 
     main:
-    AMR_ABRFORMAT(contigs_ch)
+    AMR_ABRFORMAT(contigs)
     // write a combined TSV report
     AMR_ABRFORMAT.out.abricate_report .collectFile(name: 'abricate_reports.tsv', storeDir: 'results/amr', keepHeader: true)
 }

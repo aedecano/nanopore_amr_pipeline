@@ -1,0 +1,9 @@
+2025-09-04 15:18:55	7.2s	sad_faraday	OK	f4223a92d475618af291ac9ebab054bf	6b48a90d-1063-4ab5-8982-61cf3b31d359	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../run_output/
+2025-09-04 15:24:03	8.3s	small_lovelace	OK	f4223a92d475618af291ac9ebab054bf	7f881c2a-14cf-4f11-a712-72862efd7283	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../run_output/
+2025-09-04 15:28:20	2.7s	thirsty_hugle	ERR	f4223a92d475618af291ac9ebab054bf	b49fe9fe-779a-45a9-92f8-66b7242462ad	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run/
+2025-09-04 15:28:58	1.5s	happy_goldberg	ERR	f4223a92d475618af291ac9ebab054bf	3c370e16-dc85-43d0-abda-8cb07483d853	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
+2025-09-04 15:30:16	7.7s	cheeky_volta	OK	f4223a92d475618af291ac9ebab054bf	b3bd35b0-20ba-44d5-a6c2-999aab92aca9	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
+2025-09-04 15:32:02	7.6s	evil_lagrange	OK	fbe47a6e8dfba76844bbecf279cd1663	7decf42f-6f36-4446-99be-7ff3997464fe	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
+2025-09-04 15:32:56	7.4s	reverent_leakey	OK	9fe1112c0a8e5c7363c21237532d266c	83dbb0db-7d17-4685-8b45-fde7fd86275b	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
+2025-09-04 15:33:36	6.9s	admiring_morse	OK	fefc0b6c2bb5b1724a452dc3545dc6f4	f8283abd-0544-452d-a40c-ae2aff265318	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
+2025-09-04 15:34:37	6.5s	friendly_escher	OK	c679d49039831a7c83d44565776fa329	4b8db916-eb59-4c70-8020-0aed2cd91f98	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
