@@ -7,3 +7,4 @@
 2025-09-04 15:32:56	7.4s	reverent_leakey	OK	9fe1112c0a8e5c7363c21237532d266c	83dbb0db-7d17-4685-8b45-fde7fd86275b	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
 2025-09-04 15:33:36	6.9s	admiring_morse	OK	fefc0b6c2bb5b1724a452dc3545dc6f4	f8283abd-0544-452d-a40c-ae2aff265318	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
 2025-09-04 15:34:37	6.5s	friendly_escher	OK	c679d49039831a7c83d44565776fa329	4b8db916-eb59-4c70-8020-0aed2cd91f98	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
+2025-09-04 16:08:54	12.3s	exotic_gilbert	OK	c679d49039831a7c83d44565776fa329	8a6ee097-ef0f-4468-b37b-adb6538da3e2	nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/ --outdir ../Ouput_run
