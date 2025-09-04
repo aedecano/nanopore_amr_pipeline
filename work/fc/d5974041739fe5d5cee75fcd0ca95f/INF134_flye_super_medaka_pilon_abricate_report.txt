@@ -1,5 +1,0 @@
-#FILE	SEQUENCE	START	END	STRAND	GENE	COVERAGE	COVERAGE_MAP	GAPS	%COVERAGE	%IDENTITY	DATABASE	ACCESSION	PRODUCT	RESISTANCE
-INF134_flye_super_medaka_pilon.fasta	contig_2_pilon	1838624	1839043	-	fosA_3	1-420/420	===============	0/0	100.00	98.81	resfinder	ACWO01000079	fosA	Fosfomycin
-INF134_flye_super_medaka_pilon.fasta	contig_2_pilon	3667791	3670943	-	oqxB_1	1-3153/3153	===============	0/0	100.00	99.11	resfinder	EU370913	oqxB	Nalidixic_acid;Ciprofloxacin
-INF134_flye_super_medaka_pilon.fasta	contig_2_pilon	3670967	3672142	-	oqxA_1	1-1176/1176	===============	0/0	100.00	99.92	resfinder	EU370913	oqxA	Nalidixic_acid;Ciprofloxacin
-INF134_flye_super_medaka_pilon.fasta	contig_3_pilon	1279394	1280260	+	blaSHV-187_1	1-867/867	===============	0/0	100.00	100.00	resfinder	LN515533	blaSHV-187	
