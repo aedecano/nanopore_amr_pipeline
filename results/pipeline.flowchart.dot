@@ -1,0 +1,19 @@
+digraph "pipelineflowchart" {
+rankdir=TB;
+v0 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
+v1 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v0 -> v1;
+
+v1 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v2 [label="amr_annotation:AMR_ABRFORMAT"];
+v1 -> v2 [label="contigs_ch"];
+
+v2 [label="amr_annotation:AMR_ABRFORMAT"];
+v3 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collectFile"];
+v2 -> v3;
+
+v3 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collectFile"];
+v4 [shape=point];
+v3 -> v4;
+
+}

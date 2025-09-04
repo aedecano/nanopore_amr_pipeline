@@ -332,22 +332,20 @@ process AMR_PLM_FROM_CONTIGS {
 }
 
 process AMR_ABRFORMAT {
-    label 'amr_abrformat'
-    tag {"AMR ABRicate from ${sample_id} contigs"}
-    
-    publishDir "$params.outdir/amr_abricate_contigs", mode: 'copy'
+  tag "${sample_id}"
 
-    input:
-    tuple val(sample_id), path(contigs) 
-    
-    output:
-    path ("${sample_id}_abricate_report.txt")
-    
-    script:
-    
-    """
-    abricate --db ncbi ${contigs} > ${sample_id}_abricate_report.txt
-    """
+  publishDir "results/amr", mode: 'copy', overwrite: true, pattern: "*.txt"
+
+  input:
+    tuple val(sample_id), path(contigs)
+
+  output:
+    path "${sample_id}_abricate_report.txt", emit: abricate_report
+
+  script:
+  """
+  abricate --db resfinder ${contigs} > ${sample_id}_abricate_report.txt
+  """
 }
 
 process MOBTYPER {
@@ -452,7 +450,7 @@ process PHYLOGENY {
     publishDir "$params.outdir/phylogeny", mode: 'copy'
 
     input:
-    path(gene_alignment) from ROARY.out.map { it -> file("${it}/core_gene_alignment.aln") }
+    path(gene_alignment) from ROARY.out.map { file("${it}/core_gene_alignment.aln") }
     
     output:
     path ("phylogenetic_tree.nwk")
@@ -549,7 +547,7 @@ process IQTREE {
     publishDir "$params.outdir/iqtree", mode: 'copy'
 
     input:
-    path(gene_alignment) from ROARY.out.map { it -> file("${it}/core_gene_alignment.aln") }
+    path(gene_alignment) from ROARY.out.map { file("${it}/core_gene_alignment.aln") }
     
     output:
     path ("iqtree_output")
@@ -568,7 +566,7 @@ process RAXML {
     publishDir "$params.outdir/raxml", mode: 'copy'
 
     input:
-    path(gene_alignment) from ROARY.out.map { it -> file("${it}/core_gene_alignment.aln") }
+    path(gene_alignment) from ROARY.out.map { d -> file("${d}/core_gene_alignment.aln") }
     
     output:
     path ("raxml_output")
@@ -576,7 +574,7 @@ process RAXML {
     script:
     
     """
-    raxmlHPC -s ${gene_alignment} -n raxml_output -m GTRGAMMA -p 12345 -# 100 -w $(pwd)/raxml_output
+    raxmlHPC -s ${gene_alignment} -n raxml_output -m GTRGAMMA -p 12345 -# 100 -w \$(pwd)/raxml_output
     """
 }
 

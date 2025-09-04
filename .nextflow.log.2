@@ -1,0 +1,240 @@
+Sept-04 15:05:16.545 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf -entry amr_annotation --contigs ../../../Downloads/
+Sept-04 15:05:16.580 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.6
+Sept-04 15:05:16.590 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/arundecano/.nextflow/plugins; core-plugins: nf-amazon@2.15.0,nf-azure@1.16.0,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.1,nf-k8s@1.0.0,nf-tower@1.11.4,nf-wave@1.12.1
+Sept-04 15:05:16.600 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Sept-04 15:05:16.600 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Sept-04 15:05:16.601 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Sept-04 15:05:16.605 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Sept-04 15:05:16.613 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/nextflow.config
+Sept-04 15:05:16.614 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/nextflow.config
+Sept-04 15:05:16.625 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /Users/arundecano/.nextflow/secrets/store.json
+Sept-04 15:05:16.627 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@6fe46b62] - activable => nextflow.secret.LocalSecretsProvider@6fe46b62
+Sept-04 15:05:16.632 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Sept-04 15:05:16.911 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Sept-04 15:05:16.917 [main] DEBUG nextflow.cli.CmdRun - Launching `main.nf` [sleepy_archimedes] DSL2 - revision: f4223a92d4
+Sept-04 15:05:16.917 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Sept-04 15:05:16.917 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Sept-04 15:05:16.939 [main] DEBUG nextflow.Session - Session UUID: 1a2d8924-cbd6-4d41-b1e3-e5e799c07f60
+Sept-04 15:05:16.939 [main] DEBUG nextflow.Session - Run name: sleepy_archimedes
+Sept-04 15:05:16.939 [main] DEBUG nextflow.Session - Executor pool size: 10
+Sept-04 15:05:16.941 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Sept-04 15:05:16.943 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=30; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Sept-04 15:05:21.962 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.04.6 build 5954
+  Created: 01-07-2025 11:27 UTC (12:27 BST)
+  System: Mac OS X 15.6.1
+  Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 17.0.16+0
+  Encoding: UTF-8 (UTF-8)
+  Process: 50668@Aruns-MacBook-Air.local [192.168.0.77]
+  CPUs: 10 - Mem: 24 GB (141.2 MB) - Swap: 0 (0)
+Sept-04 15:05:21.980 [main] DEBUG nextflow.Session - Work-dir: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/work [Mac OS X]
+Sept-04 15:05:21.981 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/bin
+Sept-04 15:05:21.987 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Sept-04 15:05:21.992 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Sept-04 15:05:22.004 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Sept-04 15:05:22.015 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Sept-04 15:05:22.020 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 11; maxThreads: 1000
+Sept-04 15:05:22.041 [main] DEBUG nextflow.Session - Session start
+Sept-04 15:05:22.042 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.trace.tsv
+Sept-04 15:05:22.043 [main] DEBUG nextflow.Session - Trace file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.trace.tsv -- enable the 'trace.overwrite' option in your config file to overwrite existing files
+nextflow.exception.AbortOperationException: Trace file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.trace.tsv -- enable the 'trace.overwrite' option in your config file to overwrite existing files
+	at nextflow.trace.TraceHelper.newFileWriter(TraceHelper.groovy:67)
+	at nextflow.trace.TraceFileObserver.onFlowCreate(TraceFileObserver.groovy:206)
+	at nextflow.Session$_notifyFlowCreate_lambda40.doCall(Session.groovy:1093)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowCreate(Session.groovy:1093)
+	at nextflow.Session.start(Session.groovy:585)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:133)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+Caused by: java.nio.file.FileAlreadyExistsException: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.trace.tsv
+	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:94)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+	at java.base/sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:218)
+	at java.base/java.nio.file.spi.FileSystemProvider.newOutputStream(FileSystemProvider.java:484)
+	at java.base/java.nio.file.Files.newOutputStream(Files.java:228)
+	at java.base/java.nio.file.Files.newBufferedWriter(Files.java:3008)
+	at nextflow.trace.TraceHelper.newFileWriter(TraceHelper.groovy:64)
+	... 9 common frames omitted
+Sept-04 15:05:22.044 [main] DEBUG nextflow.Session - Report file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.report.html -- enable the 'report.overwrite' option in your config file to overwrite existing files
+nextflow.exception.AbortOperationException: Report file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.report.html -- enable the 'report.overwrite' option in your config file to overwrite existing files
+	at nextflow.trace.ReportObserver.onFlowCreate(ReportObserver.groovy:133)
+	at nextflow.Session$_notifyFlowCreate_lambda40.doCall(Session.groovy:1093)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowCreate(Session.groovy:1093)
+	at nextflow.Session.start(Session.groovy:585)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:133)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+Sept-04 15:05:22.044 [main] DEBUG nextflow.Session - Timeline file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.timeline.html -- enable the 'timeline.overwrite' option in your config file to overwrite existing files
+nextflow.exception.AbortOperationException: Timeline file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.timeline.html -- enable the 'timeline.overwrite' option in your config file to overwrite existing files
+	at nextflow.trace.TimelineObserver.onFlowCreate(TimelineObserver.groovy:76)
+	at nextflow.Session$_notifyFlowCreate_lambda40.doCall(Session.groovy:1093)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowCreate(Session.groovy:1093)
+	at nextflow.Session.start(Session.groovy:585)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:133)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+Sept-04 15:05:22.174 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Sept-04 15:05:22.499 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process amr_annotation:AMR_ABRFORMAT
+Sept-04 15:05:22.499 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withName:.*` matches process amr_annotation:AMR_ABRFORMAT
+Sept-04 15:05:22.503 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Sept-04 15:05:22.503 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Sept-04 15:05:22.505 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Sept-04 15:05:22.507 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=10; memory=24 GB; capacity=10; pollInterval=100ms; dumpInterval=5m
+Sept-04 15:05:22.508 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Sept-04 15:05:22.515 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'amr_annotation:AMR_ABRFORMAT': maxForks=0; fair=false; array=0
+Sept-04 15:05:22.536 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: ASSEMBLY, ROARY, CLEANFASTQC_SINGLE, QUAST_FROM_CONTIGS, MOBTYPER, RAXML, MULTIQC_READS, SUMMARY_BLASTN, PROKKA, NANOPLOTYPER, MLST_FROM_CONTIGS, AMR_PLM_FROM_CONTIGS, amr_annotation:AMR_ABRFORMAT, AMRFINDERPLUS, PHYLOGENY, GTDBTYPER, IQTREE, FILTLONG, MULTIQC_CONTIGS, COUNT_BASES_CALLED, KRAKEN2, GENOME_DEPTH, BASECALL_DORADO, FASTANI, AMR_ABRFORMAT, MEDAKA, QUAST_FROM_READS, RAWFASTQC_SINGLE, BAM_TO_FASTQ, BASECALL_GUPPY
+Sept-04 15:05:22.537 [main] DEBUG nextflow.Session - Igniting dataflow network (2)
+Sept-04 15:05:22.539 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: ../../../Downloads/; pattern: *.{fa,fna,fasta,fas}; options: [checkIfExists:true]
+Sept-04 15:05:22.539 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > amr_annotation:AMR_ABRFORMAT
+Sept-04 15:05:22.539 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_4f58f33a67d5c12f: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/main.nf
+  Script_df98d7d77e0234c0: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/modules/nanopore.nf
+Sept-04 15:05:22.539 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Sept-04 15:05:22.539 [main] DEBUG nextflow.Session - Session await
+Sept-04 15:05:22.591 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Sept-04 15:05:22.598 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Sept-04 15:05:22.598 [Task submitter] INFO  nextflow.Session - [72/2bcf51] Submitted process > amr_annotation:AMR_ABRFORMAT (INF134_flye_super_medaka_pilon)
+Sept-04 15:05:22.603 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Sept-04 15:05:22.603 [Task submitter] INFO  nextflow.Session - [81/fa6342] Submitted process > amr_annotation:AMR_ABRFORMAT (INF151_flye_super_medaka_pilon)
+Sept-04 15:05:27.840 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: amr_annotation:AMR_ABRFORMAT (INF134_flye_super_medaka_pilon); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/work/72/2bcf51155aa29516ea06c5623a4667]
+Sept-04 15:05:27.840 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=30; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Sept-04 15:05:27.855 [TaskFinalizer-1] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=30; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Sept-04 15:05:27.858 [TaskFinalizer-1] DEBUG nextflow.Session - Cannot invoke "groovyx.gpars.agent.Agent.send(Object)" because "this.writer" is null
+java.lang.NullPointerException: Cannot invoke "groovyx.gpars.agent.Agent.send(Object)" because "this.writer" is null
+	at nextflow.trace.TraceFileObserver.onProcessComplete(TraceFileObserver.groovy:270)
+	at nextflow.Session$_notifyTaskComplete_lambda34.doCall(Session.groovy:1063)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyTaskComplete(Session.groovy:1063)
+	at nextflow.processor.TaskPollingMonitor.finalizeTask(TaskPollingMonitor.groovy:699)
+	at nextflow.processor.TaskPollingMonitor.safeFinalizeTask(TaskPollingMonitor.groovy:686)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:343)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:328)
+	at groovy.lang.MetaClassImpl.doInvokeMethod(MetaClassImpl.java:1333)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1088)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1007)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokePogoMethod(InvokerHelper.java:645)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokeMethod(InvokerHelper.java:628)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokeMethodSafe(InvokerHelper.java:82)
+	at nextflow.processor.TaskPollingMonitor$_checkTaskStatus_lambda8.doCall(TaskPollingMonitor.groovy:676)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Sept-04 15:05:28.752 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: amr_annotation:AMR_ABRFORMAT (INF151_flye_super_medaka_pilon); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/work/81/fa634278e3f6d7629f1efb5f45bc55]
+Sept-04 15:05:28.755 [TaskFinalizer-2] DEBUG nextflow.Session - Cannot invoke "groovyx.gpars.agent.Agent.send(Object)" because "this.writer" is null
+java.lang.NullPointerException: Cannot invoke "groovyx.gpars.agent.Agent.send(Object)" because "this.writer" is null
+	at nextflow.trace.TraceFileObserver.onProcessComplete(TraceFileObserver.groovy:270)
+	at nextflow.Session$_notifyTaskComplete_lambda34.doCall(Session.groovy:1063)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyTaskComplete(Session.groovy:1063)
+	at nextflow.processor.TaskPollingMonitor.finalizeTask(TaskPollingMonitor.groovy:699)
+	at nextflow.processor.TaskPollingMonitor.safeFinalizeTask(TaskPollingMonitor.groovy:686)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:343)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:328)
+	at groovy.lang.MetaClassImpl.doInvokeMethod(MetaClassImpl.java:1333)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1088)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1007)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokePogoMethod(InvokerHelper.java:645)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokeMethod(InvokerHelper.java:628)
+	at org.codehaus.groovy.runtime.InvokerHelper.invokeMethodSafe(InvokerHelper.java:82)
+	at nextflow.processor.TaskPollingMonitor$_checkTaskStatus_lambda8.doCall(TaskPollingMonitor.groovy:676)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Sept-04 15:05:28.757 [main] DEBUG nextflow.Session - Session await > all processes finished
+Sept-04 15:05:28.764 [Actor Thread 7] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 2; slices: 1; internal sort time: 0.006 s; external sort time: 0.001 s; total time: 0.007 s
+Sept-04 15:05:28.766 [Actor Thread 7] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/work/collect-file/1250ceb923c690ec3a87f5b5d92861e6
+Sept-04 15:05:28.769 [Actor Thread 7] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /var/folders/ry/88pkjc8d161btnr0mstvwyww0000gn/T/nxf-6195936301773688115
+Sept-04 15:05:28.857 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Sept-04 15:05:28.857 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Sept-04 15:05:28.859 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Sept-04 15:05:28.859 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
+Sept-04 15:05:28.861 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=2; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=44s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=2; peakCpus=8; peakMemory=16 GB; ]
+Sept-04 15:05:28.861 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow completed -- saving trace file
+Sept-04 15:05:28.861 [main] DEBUG nextflow.Session - Cannot invoke "groovyx.gpars.agent.Agent.await()" because "this.writer" is null
+java.lang.NullPointerException: Cannot invoke "groovyx.gpars.agent.Agent.await()" because "this.writer" is null
+	at nextflow.trace.TraceFileObserver.onFlowComplete(TraceFileObserver.groovy:221)
+	at nextflow.Session$_notifyFlowComplete_lambda45.doCall(Session.groovy:1107)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowComplete(Session.groovy:1107)
+	at nextflow.Session.shutdown0(Session.groovy:768)
+	at nextflow.Session.destroy(Session.groovy:713)
+	at nextflow.script.ScriptRunner.shutdown(ScriptRunner.groovy:263)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:147)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+Sept-04 15:05:28.861 [main] DEBUG nextflow.trace.ReportObserver - Workflow completed -- rendering execution report
+Sept-04 15:05:29.327 [main] WARN  nextflow.trace.ReportObserver - Failed to render execution report -- see the log file for details
+nextflow.exception.AbortOperationException: Report file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.report.html -- enable the 'report.overwrite' option in your config file to overwrite existing files
+	at nextflow.trace.TraceHelper.newFileWriter(TraceHelper.groovy:67)
+	at nextflow.trace.ReportObserver.renderHtml(ReportObserver.groovy:284)
+	at nextflow.trace.ReportObserver.onFlowComplete(ReportObserver.groovy:143)
+	at nextflow.Session$_notifyFlowComplete_lambda45.doCall(Session.groovy:1107)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowComplete(Session.groovy:1107)
+	at nextflow.Session.shutdown0(Session.groovy:768)
+	at nextflow.Session.destroy(Session.groovy:713)
+	at nextflow.script.ScriptRunner.shutdown(ScriptRunner.groovy:263)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:147)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+Caused by: java.nio.file.FileAlreadyExistsException: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.report.html
+	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:94)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+	at java.base/sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:218)
+	at java.base/java.nio.file.spi.FileSystemProvider.newOutputStream(FileSystemProvider.java:484)
+	at java.base/java.nio.file.Files.newOutputStream(Files.java:228)
+	at java.base/java.nio.file.Files.newBufferedWriter(Files.java:3008)
+	at nextflow.trace.TraceHelper.newFileWriter(TraceHelper.groovy:64)
+	... 12 common frames omitted
+Sept-04 15:05:29.327 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
+Sept-04 15:05:29.372 [main] WARN  nextflow.trace.TimelineObserver - Failed to render execution timeline -- see the log file for details
+nextflow.exception.AbortOperationException: Timeline file already exists: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.timeline.html -- enable the 'timeline.overwrite' option in your config file to overwrite existing files
+	at nextflow.trace.TraceHelper.newFileWriter(TraceHelper.groovy:67)
+	at nextflow.trace.TimelineObserver.renderHtml(TimelineObserver.groovy:178)
+	at nextflow.trace.TimelineObserver.onFlowComplete(TimelineObserver.groovy:87)
+	at nextflow.Session$_notifyFlowComplete_lambda45.doCall(Session.groovy:1107)
+	at nextflow.Session.notifyEvent(Session.groovy:1138)
+	at nextflow.Session.notifyFlowComplete(Session.groovy:1107)
+	at nextflow.Session.shutdown0(Session.groovy:768)
+	at nextflow.Session.destroy(Session.groovy:713)
+	at nextflow.script.ScriptRunner.shutdown(ScriptRunner.groovy:263)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:147)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)
+Caused by: java.nio.file.FileAlreadyExistsException: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline.timeline.html
+	at java.base/sun.nio.fs.UnixException.translateToIOException(UnixException.java:94)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:106)
+	at java.base/sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+	at java.base/sun.nio.fs.UnixFileSystemProvider.newByteChannel(UnixFileSystemProvider.java:218)
+	at java.base/java.nio.file.spi.FileSystemProvider.newOutputStream(FileSystemProvider.java:484)
+	at java.base/java.nio.file.Files.newOutputStream(Files.java:228)
+	at java.base/java.nio.file.Files.newBufferedWriter(Files.java:3008)
+	at nextflow.trace.TraceHelper.newFileWriter(TraceHelper.groovy:64)
+	... 12 common frames omitted
+Sept-04 15:05:29.382 [main] WARN  nextflow.dag.GraphvizRenderer - Graphviz is required to render the execution DAG in the given format -- See http://www.graphviz.org for more info.
+Sept-04 15:05:29.432 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Sept-04 15:05:29.444 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Sept-04 15:05:29.444 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

@@ -1,0 +1,3 @@
+task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
+2	7c/cf9375	51066	amr_annotation:AMR_ABRFORMAT (INF134_flye_super_medaka_pilon)	COMPLETED	0	2025-09-04 15:09:39.363	5s	5s	-	-	-	-	-
+1	91/9833c0	51065	amr_annotation:AMR_ABRFORMAT (INF151_flye_super_medaka_pilon)	COMPLETED	0	2025-09-04 15:09:39.358	5.2s	5s	-	-	-	-	-
