@@ -33,7 +33,7 @@ main.nf
 
 Run with the `conda` profile:
 ```
-nextflow run nanopore.nf -profile conda -c ~/conda_setup/nextflow.config
+nextflow run nanopore.nf -profile conda -c ~/conda_setup/conda.config
 ```
 
 ## Notes
