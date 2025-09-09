@@ -79,22 +79,21 @@ workflow assembly_amr_pangenome {
        Channel.fromPath(params.ref, checkIfExists:true)
            //.view()       
            .first()
-           .set{refFasta}
+           .set{ref}
        main:
-       RAWFASTQC_SINGLE(reads)
-       //FASTP_SINGLE(reads)
+       //RAWFASTQC_SINGLE(reads)
        FILTLONG(reads)
-       CLEANFASTQC_SINGLE(FASTP_SINGLE.out.cat_fastq)
-       MULTIQC_READS(CLEANFASTQC_SINGLE.out.collect())
+       //CLEANFASTQC_SINGLE(FILTLONG.out.reads)
+       //MULTIQC_READS(RAWFASTQC_SINGLE.out.fastqc.mix(CLEANFASTQC_SINGLE.out.fastqc ))
        ASSEMBLY(FILTLONG.out.reads)
-       QUAST_FROM_READS(ASSEMBLY.out.assembly)
-       MULTIQC_CONTIGS(QUAST_FROM_READS.out.quast_dir.collect())
-       GTDBTK(ASSEMBLY.out.assembly)
+       //QUAST_FROM_READS(ASSEMBLY.out.assembly)
+       //MULTIQC_CONTIGS(QUAST_FROM_READS.out.quast_dir.collect())
+       //GTDBTK(ASSEMBLY.out.assembly)
        AMR_ABRFORMAT(ASSEMBLY.out.assembly)
-       PROKKA(ASSEMBLY.out.assembly)
-       ROARY(PROKKA.out.gff.collect())
-       RAXML(ROARY.out.core_gene_alignment)
-       IQTREE(RAXML.out.raxml_bestTree)
+       //PROKKA(ASSEMBLY.out.assembly)
+       //ROARY(PROKKA.out.gff.collect())
+       //RAXML(ROARY.out.core_gene_alignment)
+       //IQTREE(RAXML.out.raxml_bestTree)
 }
 
 

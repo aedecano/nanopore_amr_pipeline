@@ -92,7 +92,8 @@ process RAWFASTQC_SINGLE {
     tuple val(sample_id), path(reads) 
     
     output:
-    path ("${sample_id}_fastqc/${sample_id}.txt")
+    //path ("${sample_id}_fastqc/${sample_id}.txt")
+    path "${sample_id}_fastqc/*", emit: fastqc
     
     script:
     
@@ -132,7 +133,8 @@ process FILTLONG {
     tuple val(sample_id), path(reads) 
     
     output:
-    tuple val(sample_id), path("${sample_id}_filtlong.fastq")
+    //tuple val(sample_id), path("${sample_id}_filtlong.fastq")
+    path ("*.filt.fastq.gz"), emit: reads
     
     script:
     
@@ -151,7 +153,8 @@ process CLEANFASTQC_SINGLE {
     tuple val(sample_id), path(reads) 
     
     output:
-    path ("${sample_id}_clean_fastqc/${sample_id}.txt")
+    //path ("${sample_id}_clean_fastqc/${sample_id}.txt")
+    path "${sample_id}_clean_fastqc/*", emit: fastqc
     
     script:
     
@@ -187,7 +190,7 @@ process ASSEMBLY {
     tuple val(sample_id), path(reads) 
     
     output:
-    tuple val(sample_id), path("${sample_id}_assembly/${sample_id}_contigs.fasta")
+    tuple val(sample_id), path("${sample_id}_assembly/${sample_id}_contigs.fasta"), emit: assembly
     
     script:
     
@@ -409,37 +412,39 @@ process PROKKA {
     label 'prokka'
     tag {"Prokka annotation ${sample_id} contigs"}
     
-    publishDir "$params.outdir/prokka_annotations", mode: 'copy'
+    publishDir "$params.outdir/prokka", mode: 'copy'
 
     input:
     tuple val(sample_id), path(contigs) 
     
     output:
-    path ("${sample_id}_prokka")
+    path '*.gff3', emit: gff
+    path '*.gbk', emit: gbk
     
     script:
     
     """
-    prokka --outdir ${sample_id}_prokka --prefix ${sample_id} --cpus ${task.cpus} ${contigs}
+    prokka --outdir ${sample_id}_prokka --prefix ${sample_id} ${contigs}
     """
 }
 
+
 process ROARY {
     label 'roary'
-    tag {"Roary pangenome analysis"}
-    
-    publishDir "$params.outdir/roary", mode: 'copy'
+    tag "Roary pangenome analysis"
+
+    publishDir "${params.outdir}/roary", mode: 'copy'
 
     input:
-    path(annotations) from PROKKA.out.collect()
-    
+    // Accept a LIST of staged GFFs (emitted by `collect()`)
+    path annotations
+
     output:
-    path ("roary_output")
-    
+    path "roary_output"
+
     script:
-    
     """
-    roary -e --mafft -p ${task.cpus} -f roary_output ${annotations}
+    roary -e --mafft -p ${task.cpus} -f roary_output ${annotations.join(' ')}
     """
 }
 

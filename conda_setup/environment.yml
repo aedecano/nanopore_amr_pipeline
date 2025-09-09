@@ -4,7 +4,6 @@ channels:
   - bioconda
   - defaults
 dependencies:
-  - abricate
   - plasmidfinder
   - ncbi-amrfinderplus
   - flye
