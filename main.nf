@@ -63,7 +63,7 @@ workflow basecall_extractFQ {
        Channel.fromPath(params.fast5, checkIfExists: true)
            .map{it}
            //.view()
-           .set{fast5s}
+           .set{fast5}
        main:
        BASECALL_DORADO(fast5)
        BAM_TO_FASTQ(BASECALL_DORADO.out.bam)
