@@ -54,11 +54,9 @@ mamba env create -f environment.yml
 conda activate nanopore_amr
 
 # Run the test dataset
-nextflow run main.nf \
+nextflow run -entry kraken2_classification main.nf \
   --reads "data/*.fastq.gz" \
   --kraken_db /path/to/kraken_db \
-  --gtdbtk_db /path/to/gtdbtk_db \
-  --fastani_db /path/to/fastani_db \
   --outdir results
 ```
 ## Visualise results
