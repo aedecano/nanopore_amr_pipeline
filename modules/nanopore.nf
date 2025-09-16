@@ -180,9 +180,9 @@ process MULTIQC_CONTIGS {
     """ 
 }
 
-process ASSEMBLY {
+process FLYE {
     label 'assembly'
-    tag {"Assembly ${sample_id} reads"}
+    tag {"Flye: ${sample_id} reads"}
     
     publishDir "$params.outdir/assemblies", mode: 'copy'
 

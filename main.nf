@@ -3,14 +3,6 @@
 /* 
 A pipeline for de novo assembly, specied ID and AMR annotation of Nanopore long read libraries
 
-QC
-
-
-Mapping and Variant calling
- 
- 
-Assembly
-*/
 
 /*
 #==============================================
@@ -27,7 +19,7 @@ Modules
 */
 
 include { BASECALL_DORADO; COUNT_BASES_CALLED } from './modules/nanopore.nf'
-include { ASSEMBLY } from './modules/nanopore.nf'
+include { FLYE } from './modules/nanopore.nf'
 include { KRAKEN2 } from './modules/nanopore.nf'
 include { GENOME_DEPTH } from './modules/nanopore.nf'
 //include { ASSEMBLY_STATS; ASSEMBLY_QUALITY; GENOME_DEPTH } from './modules/nanopore.nf'
@@ -85,12 +77,12 @@ workflow assembly_amr_pangenome {
        FILTLONG(reads)
        //CLEANFASTQC_SINGLE(FILTLONG.out.reads)
        //MULTIQC_READS(RAWFASTQC_SINGLE.out.fastqc.mix(CLEANFASTQC_SINGLE.out.fastqc ))
-       ASSEMBLY(FILTLONG.out.reads)
-       //QUAST_FROM_READS(ASSEMBLY.out.assembly)
+       FLYE(FILTLONG.out.reads)
+       //QUAST_FROM_READS(FLYE.out.assembly)
        //MULTIQC_CONTIGS(QUAST_FROM_READS.out.quast_dir.collect())
-       //GTDBTK(ASSEMBLY.out.assembly)
-       AMR_ABRFORMAT(ASSEMBLY.out.assembly)
-       //PROKKA(ASSEMBLY.out.assembly)
+       //GTDBTK(FLYE.out.assembly)
+       AMR_ABRFORMAT(FLYE.out.assembly)
+       //PROKKA(FLYE.out.assembly)
        //ROARY(PROKKA.out.gff.collect())
        //RAXML(ROARY.out.core_gene_alignment)
        //IQTREE(RAXML.out.raxml_bestTree)
