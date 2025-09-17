@@ -185,18 +185,26 @@ process MULTIQC_CONTIGS {
 }
 
 process FLYE {
-  tag "!{sample_id}"
-    input:
-        tuple val(sample_id), path(reads)
+  tag "$sample_id"
+  label 'assembly'
+  publishDir "${params.outdir}/flye", mode: 'copy'
 
-    output:
-        tuple val(sample_id), path("${sample_id}_assembly/${sample_id}_contigs.fasta"), emit: assembly
-  
-    script:      
-        """
-        flye --nano-raw "!{reads}" --out-dir . --threads ${task.cpus}
-        mv assembly.fasta "!{sample_id}.contigs.fasta"
-        """
+  input:
+    tuple val(sample_id), path(reads)
+
+  output:
+    tuple val(sample_id), path("${sample_id}.contigs.fasta"), emit: assembly
+
+  script:
+  """
+  set -eo pipefail
+  echo "DEBUG sample_id=${sample_id}" >&2
+  echo "DEBUG reads=${reads}" >&2
+  ls -l "${reads}" >&2 || true
+
+  flye --nano-raw "${reads}" --out-dir . --threads ${task.cpus}
+  mv assembly.fasta "${sample_id}.contigs.fasta"
+  """
 }
 
 
