@@ -264,3 +264,67 @@ process MULTIQC {
   mv mqc_out/multiqc_data .
   """
 }
+
+// ------------- Kraken2 (taxonomy on reads) -------------
+process KRAKEN2 {
+  tag "$sample_id"
+  label 'medium'
+  publishDir "${params.outdir}/kraken2", mode: 'copy'
+
+  input:
+    tuple val(sample_id), path(reads)
+
+  output:
+    tuple val(sample_id), \
+         path("${sample_id}.kraken2.report"), emit: report, \
+         path("${sample_id}.kraken2.tsv"),    emit: classified
+
+  when:
+    params.kraken2_db && params.kraken2_db != ""
+
+  script:
+  """
+  set -eo pipefail
+  kraken2 \\
+    --db ${params.kraken2_db} \\
+    --threads ${task.cpus ?: 4} \\
+    --report ${sample_id}.kraken2.report \\
+    --output ${sample_id}.kraken2.tsv \\
+    --gzip-compressed \\
+    ${reads}
+  """
+}
+
+// ------------- GTDB-Tk (taxonomy on assemblies) -------------
+process GTDBTK_CLASSIFY {
+  tag "$sample_id"
+  label 'heavy'
+  publishDir "${params.outdir}/gtdbtk", mode: 'copy'
+
+  input:
+    tuple val(sample_id), path(assembly)
+
+  output:
+    tuple val(sample_id), \
+         path("${sample_id}_gtdbtk_summary.tsv"),      emit: summary, \
+         path("${sample_id}_gtdbtk_classification.tsv"), emit: classification, \
+         path("${sample_id}_gtdbtk_logs"),               emit: logs_dir
+
+  when:
+    params.gtdbtk_db && params.gtdbtk_db != ""
+
+  script:
+  """
+  set -eo pipefail
+  mkdir -p ${sample_id}_gtdbtk_work
+  gtdbtk classify_wf \\
+    --genome ${assembly} \\
+    --out_dir ${sample_id}_gtdbtk_work \\
+    --data_dir ${params.gtdbtk_db} \\
+    --cpus ${task.cpus ?: 8}
+  # Collect key outputs with consistent names
+  cp ${sample_id}_gtdbtk_work/classify/summary.tsv ${sample_id}_gtdbtk_summary.tsv || true
+  cp ${sample_id}_gtdbtk_work/classify/gtdbtk.bac120.classification.tsv ${sample_id}_gtdbtk_classification.tsv || true
+  cp -r ${sample_id}_gtdbtk_work/logs ${sample_id}_gtdbtk_logs || true
+  """
+}

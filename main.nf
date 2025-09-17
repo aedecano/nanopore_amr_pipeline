@@ -1,8 +1,10 @@
 nextflow.enable.dsl = 2
 
-include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; ABRICATE; ABRICATE_TAG; MERGE_ABRICATE; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC } from './modules/nanopore.nf'
+include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; ABRICATE; ABRICATE_TAG; MERGE_ABRICATE; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
 
 // -------- Params --------
+params.kraken2_db = params.kraken2_db ?: null
+params.gtdbtk_db  = params.gtdbtk_db  ?: null
 params.reads  = params.reads ?: null
 params.outdir = params.outdir ?: 'results'
 
@@ -73,6 +75,36 @@ workflow assembly_amr_pangenome {
     //iqtree_tree          = iq.treefile
     multiqc_report       = mqc.report
 }
+
+// default entrypoint
+
+
+// -------- Workflow: taxonomy_from_reads --------
+// Takes nanopore reads (tuple: sample_id, reads), runs Kraken2 on reads,
+// assembles with Flye, then runs GTDB-Tk on the assembly.
+workflow taxonomy_from_reads {
+
+  take:
+    reads
+
+  main:
+    // Run Kraken2 directly on raw reads
+    kraken = KRAKEN2(reads)
+
+    // Assemble reads with Flye, then classify assembly with GTDB-Tk
+    flye = FLYE(reads)
+    gtdb = GTDBTK_CLASSIFY(flye.assembly)
+
+  emit:
+    kraken_report: kraken.report
+    kraken_calls:  kraken.classified
+    assembly:      flye.assembly
+    gtdb_summary:  gtdb.summary
+    gtdb_class:    gtdb.classification
+}
+
+// make this the default entry with:
+// workflow { taxonomy_from_reads(reads) }
 
 // default entrypoint
 workflow { assembly_amr_pangenome(reads) }
