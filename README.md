@@ -15,26 +15,16 @@ A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species
 
 6. Reproducible via environment.yml
 
-## Workflow
+## Workflow DAG
 
-main.nf
-├── filter_reads.nf
-├── assemble_genome.nf
-├── classify_gtdb.nf
-├── classify_kraken.nf
-├── compute_fastani.nf
-├── detect_amr.nf
-└── summarize_results.nf
+<p align="center">
+  <img src="docs/nanopore_pipeline_dag.png" width="700" alt="Pipeline DAG">
+</p>
 
 ## Usage
 
 - `nextflow.config` — maps each process label in your pipeline to a dedicated Conda env YAML.
 - `envs/*.yml` — one environment per label/tool.
-
-Run with the `conda` profile:
-```
-nextflow run nanopore.nf -profile conda -c ~/conda_setup/conda.config
-```
 
 ## Notes
 - **GTDB-Tk** requires reference data (`GTDBTK_DATA_PATH`), and sometimes specific versions of `pplacer/fasttree`.
@@ -54,14 +44,14 @@ mamba env create -f environment.yml
 conda activate nanopore_amr
 
 # Run the test dataset
-nextflow run -entry kraken2_classification main.nf \
-  --reads "data/*.fastq.gz" \
-  --kraken_db /path/to/kraken_db \
-  --outdir results
+nextflow run main.nf \
+  -entry assembly_amr_pangenome \
+  --reads '/path/to/*.fastq.gz' \
+  -profile conda \
+  -with-report -with-timeline -with-trace -with-dag results/report/flow.svg 
 ```
 ## Visualise results
 ```
-Rscript scripts/visualize_results.R results/species_amr_summary.csv
 ```
 ## Expected Output
 
