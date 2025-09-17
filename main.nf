@@ -1,116 +1,78 @@
-#!/usr/bin/env nextflow
-
-/* 
-A pipeline for de novo assembly, specied ID and AMR annotation of Nanopore long read libraries
-
-
-/*
-#==============================================
-Enable DSL2
-#==============================================
-*/
-
 nextflow.enable.dsl = 2
 
-/*
-#==============================================
-Modules
-#==============================================
-*/
+include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; ABRICATE; ABRICATE_TAG; MERGE_ABRICATE; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC } from './modules/nanopore.nf'
 
-include { BASECALL_DORADO; COUNT_BASES_CALLED } from './modules/nanopore.nf'
-include { FLYE } from './modules/nanopore.nf'
-include { KRAKEN2 } from './modules/nanopore.nf'
-include { GENOME_DEPTH } from './modules/nanopore.nf'
-//include { ASSEMBLY_STATS; ASSEMBLY_QUALITY; GENOME_DEPTH } from './modules/nanopore.nf'
-include { RAXML } from './modules/nanopore.nf'
-include { IQTREE } from './modules/nanopore.nf'
-include { GTDBTYPER } from './modules/nanopore.nf'
-include { AMR_ABRFORMAT } from './modules/nanopore.nf'
-include { PROKKA } from './modules/nanopore.nf'
-include { ROARY } from './modules/nanopore.nf'
-include { RAWFASTQC_SINGLE; CLEANFASTQC_SINGLE; MULTIQC_READS } from './modules/nanopore.nf'
-include { FILTLONG } from './modules/nanopore.nf'
-//include { FASTP_SINGLE } from './modules/nanopore.nf'
-include { QUAST_FROM_READS; MULTIQC_CONTIGS } from './modules/nanopore.nf'
+// -------- Params --------
+params.reads  = params.reads ?: null
+params.outdir = params.outdir ?: 'results'
 
-/*
-#==============================================
-Parameters
-#==============================================
-*/
-
-params.fast5 = ""
-params.ref = ""
-params.reads = ""
-params.outdir = ""
-params.contigs = ""
-params.mlstdb = ""
-params.prefix = ""
-params.blastn = ""
-params.mlst_loci = ""
-params.kraken2_db= ""
-
-workflow basecall_extractFQ {
-       Channel.fromPath(params.fast5, checkIfExists: true)
-           .map{it}
-           //.view()
-           .set{fast5}
-       main:
-       BASECALL_DORADO(fast5)
-       BAM_TO_FASTQ(BASECALL_DORADO.out.bam)
-       COUNT_BASES_CALLED(BAM_TO_FASTQ.out.fastq)
-}
-
-
-workflow assembly_amr_pangenome {
-    // AFTER — ONT single-end; produce (sample_id, file) tuples
+// -------- Channels (TOP LEVEL) --------
 Channel
   .fromPath(params.reads, checkIfExists: true)
   .ifEmpty { error "No reads found for: ${params.reads}" }
   .map { f ->
-      // robust sample id from filename
-      def sid = f.name
-                .replaceFirst(/\.fastq\.gz$/, '')
-                .replaceFirst(/\.fq\.gz$/, '')
-                .replaceFirst(/\.fastq$/, '')
-                .replaceFirst(/\.fq$/, '')
-      tuple(sid, f)
-        }
-  //.view { v -> "READS_IN -> ${v}" }   // uncomment to debug
-  .set { reads }
-       main:
-       filt = FILTLONG(reads)
-       flye = FLYE(filt.reads)
+    def sid = f.name
+      .replaceFirst(/\.fastq\.gz$/, '')
+      .replaceFirst(/\.fq\.gz$/, '')
+      .replaceFirst(/\.fastq$/, '')
+      .replaceFirst(/\.fq$/, '')
+    tuple(sid, f)
+  }
+  .set { reads }   // (sample_id, fastq.gz)
+
+// Optional: drop empty files early
+// reads = reads.filter { sid, fq -> fq.size() > 0 }
+
+// ---------------- Workflows ----------------
+workflow assembly_amr_pangenome {
+
+  main:
+    // QC -> Filter -> QC
+    np_raw   = NANOPLOT_RAW(reads)
+    filt     = FILTLONG(reads)            // -> (sample_id, .filt.fastq.gz)
+    np_filt  = NANOPLOT_FILT(filt.reads)
+
+    // Assemble
+    flye     = FLYE(filt.reads)           // -> (sample_id, .contigs.fasta)
+
+    // ABRicate (per sample), tag, merge
+    abri     = ABRICATE(flye.assembly)
+    abri_tag = ABRICATE_TAG(abri.tsv)
+    abri_all = abri_tag.tagged.collect()
+    abri_merged = MERGE_ABRICATE(abri_all)
+
+    // Bakta (per sample)
+    //bakta    = BAKTA(flye.assembly)
+
+    // Panaroo (needs a list of GFFs)
+    //gff_list = bakta.gff.map { sid, g -> g }.collect()
+    //pana     = PANAROO(gff_list)
+
+    // Trees from core alignment
+    //raxml    = RAXML_NG(pana.core_alignment)
+    //iq       = IQTREE2(pana.core_alignment)
+
+    // MultiQC inputs: NanoPlot dirs and ABRicate TSVs (MultiQC parses both)
+    mqc_inputs = np_raw.report_dir.map { _, d -> d }
+                .mix( np_filt.report_dir.map { _, d -> d } )
+                .mix( abri.tsv.map { _, f -> f } )
+                .collect()
+    mqc = MULTIQC(mqc_inputs)
+
+  emit:
+    nanoplot_raw_dirs    = np_raw.report_dir
+    nanoplot_filt_dirs   = np_filt.report_dir
+    filtered_reads       = filt.reads
+    assemblies           = flye.assembly
+    abricate_per_sample  = abri.tsv
+    abricate_summary     = abri.summary
+    abricate_merged_tsv  = abri_merged.merged
+    //bakta_gff            = bakta.gff
+    //core_alignment       = pana.core_alignment
+    //raxml_tree           = raxml.besttree
+    //iqtree_tree          = iq.treefile
+    multiqc_report       = mqc.report
 }
 
-
-workflow amr_annotation {
-
-    // Accept either a glob (e.g. ".../*.fasta") or a directory (".../Downloads")
-    def pattern = params.contigs
-    if (file(pattern).isDirectory()) {
-        // include common FASTA extensions; adjust as you like
-        pattern = "${pattern}/*.{fa,fna,fasta,fas}"
-    }
-
-    Channel.fromPath(pattern, checkIfExists: true)
-           .map { f -> tuple(f.baseName, f) }   // (sample_id, path)
-           .set { contigs }
-
-    main:
-    AMR_ABRFORMAT(contigs)
-    // write a combined TSV report
-    AMR_ABRFORMAT.out.abricate_report .collectFile(name: 'abricate_reports.tsv', storeDir: 'results/amr', keepHeader: true)
-}
-
-
-workflow kraken2_classification {
-       Channel.fromPath(params.reads, checkIfExists: true)
-           .map{it}
-           //.view()
-           .set{reads}
-       main:
-       KRAKEN2(reads, params.kraken2_db)
-}
-
+// default entrypoint
+workflow { assembly_amr_pangenome(reads) }
