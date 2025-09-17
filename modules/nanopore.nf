@@ -124,23 +124,27 @@ process MULTIQC_READS {
 }
 
 process FILTLONG {
-    label 'filtlong'
-    tag {"Filtlong ${sample_id} reads"}
-    
-    publishDir "$params.outdir/cleaned_reads", mode: 'copy'
+  label 'filtlong'
+  tag    "$sample_id"
+  publishDir "${params.outdir}/filtlong", mode: 'copy'
 
-    input:
-    tuple val(sample_id), path(reads) 
-    
-    output:
-    //tuple val(sample_id), path("${sample_id}_filtlong.fastq")
-    path ("*.filt.fastq.gz"), emit: reads
-    
-    script:
-    
-    """
-    filtlong --min_length 1000 --keep_percent 90 ${reads} > ${sample_id}_filtlong.fastq
-    """
+  input:
+    tuple val(sample_id), path(reads)
+
+  output:
+    tuple val(sample_id), path("${sample_id}.filt.fastq.gz"), emit: reads
+
+  // Use script: with Groovy interpolation; avoid `set -u`
+  script:
+  """
+  set -eo pipefail
+  echo "DEBUG sample_id=${sample_id}" >&2
+  echo "DEBUG reads=${reads}" >&2
+  test -s "${reads}" || { echo "Input reads missing/empty: ${reads}" >&2; exit 1; }
+
+  filtlong --min_length 1000 --target_bases 200000000 "${reads}" \
+    | gzip -c > "${sample_id}.filt.fastq.gz"
+  """
 }
 
 process CLEANFASTQC_SINGLE {
@@ -181,23 +185,20 @@ process MULTIQC_CONTIGS {
 }
 
 process FLYE {
-    label 'assembly'
-    tag {"Flye: ${sample_id} reads"}
-    
-    publishDir "$params.outdir/assemblies", mode: 'copy'
-
+  tag "!{sample_id}"
     input:
-    tuple val(sample_id), path(reads) 
-    
+        tuple val(sample_id), path(reads)
+
     output:
-    tuple val(sample_id), path("${sample_id}_assembly/${sample_id}_contigs.fasta"), emit: assembly
-    
-    script:
-    
-    """
-    flye --nano-raw ${reads} --out-dir ${sample_id}_assembly --threads ${task.cpus} --genome-size 5m
-    """
+        tuple val(sample_id), path("${sample_id}_assembly/${sample_id}_contigs.fasta"), emit: assembly
+  
+    script:      
+        """
+        flye --nano-raw "!{reads}" --out-dir . --threads ${task.cpus}
+        mv assembly.fasta "!{sample_id}.contigs.fasta"
+        """
 }
+
 
 process QUAST_FROM_READS {
     label 'quast'

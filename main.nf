@@ -64,28 +64,24 @@ workflow basecall_extractFQ {
 
 
 workflow assembly_amr_pangenome {
-       Channel.fromPath(params.reads, checkIfExists: true)
-           .map{it}
-           //.view()
-           .set{reads}
-       Channel.fromPath(params.ref, checkIfExists:true)
-           //.view()       
-           .first()
-           .set{ref}
+    // AFTER — ONT single-end; produce (sample_id, file) tuples
+Channel
+  .fromPath(params.reads, checkIfExists: true)
+  .ifEmpty { error "No reads found for: ${params.reads}" }
+  .map { f ->
+      // robust sample id from filename
+      def sid = f.name
+                .replaceFirst(/\.fastq\.gz$/, '')
+                .replaceFirst(/\.fq\.gz$/, '')
+                .replaceFirst(/\.fastq$/, '')
+                .replaceFirst(/\.fq$/, '')
+      tuple(sid, f)
+        }
+  //.view { v -> "READS_IN -> ${v}" }   // uncomment to debug
+  .set { reads }
        main:
-       //RAWFASTQC_SINGLE(reads)
-       FILTLONG(reads)
-       //CLEANFASTQC_SINGLE(FILTLONG.out.reads)
-       //MULTIQC_READS(RAWFASTQC_SINGLE.out.fastqc.mix(CLEANFASTQC_SINGLE.out.fastqc ))
-       FLYE(FILTLONG.out.reads)
-       //QUAST_FROM_READS(FLYE.out.assembly)
-       //MULTIQC_CONTIGS(QUAST_FROM_READS.out.quast_dir.collect())
-       //GTDBTK(FLYE.out.assembly)
-       AMR_ABRFORMAT(FLYE.out.assembly)
-       //PROKKA(FLYE.out.assembly)
-       //ROARY(PROKKA.out.gff.collect())
-       //RAXML(ROARY.out.core_gene_alignment)
-       //IQTREE(RAXML.out.raxml_bestTree)
+       filt = FILTLONG(reads)
+       flye = FLYE(filt.reads)
 }
 
 
@@ -98,10 +94,9 @@ workflow amr_annotation {
         pattern = "${pattern}/*.{fa,fna,fasta,fas}"
     }
 
-    Channel
-        .fromPath(pattern, checkIfExists: true)
-        .map { f -> tuple(f.baseName, f) }   // (sample_id, path)
-        .set { contigs }
+    Channel.fromPath(pattern, checkIfExists: true)
+           .map { f -> tuple(f.baseName, f) }   // (sample_id, path)
+           .set { contigs }
 
     main:
     AMR_ABRFORMAT(contigs)
