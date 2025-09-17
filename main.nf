@@ -60,7 +60,7 @@ workflow assembly_amr_pangenome {
                 .mix( abri.tsv.map { _, f -> f } )
                 .collect()
     mqc = MULTIQC(mqc_inputs)
-
+    
   emit:
     nanoplot_raw_dirs    = np_raw.report_dir
     nanoplot_filt_dirs   = np_filt.report_dir
@@ -96,15 +96,15 @@ workflow taxonomy_from_reads {
     gtdb = GTDBTK_CLASSIFY(flye.assembly)
 
   emit:
-    kraken_report: kraken.report
-    kraken_calls:  kraken.classified
-    assembly:      flye.assembly
-    gtdb_summary:  gtdb.summary
-    gtdb_class:    gtdb.classification
+  kraken_report = kraken.report
+  kraken_calls  = kraken.classified
+  assembly      = flye.assembly
+  gtdb_summary  = gtdb.summary
+  gtdb_class    = gtdb.classification
 }
 
 // make this the default entry with:
 // workflow { taxonomy_from_reads(reads) }
 
 // default entrypoint
-workflow { assembly_amr_pangenome(reads) }
+workflow { assembly_amr_pangenome() }

@@ -268,30 +268,32 @@ process MULTIQC {
 // ------------- Kraken2 (taxonomy on reads) -------------
 process KRAKEN2 {
   tag "$sample_id"
-  label 'medium'
+  label 'light'
   publishDir "${params.outdir}/kraken2", mode: 'copy'
 
   input:
     tuple val(sample_id), path(reads)
 
   output:
-    tuple val(sample_id), \
-         path("${sample_id}.kraken2.report"), emit: report, \
-         path("${sample_id}.kraken2.tsv"),    emit: classified
+    tuple val(sample_id), path("${sample_id}.kraken2.report"), emit: report
+    tuple val(sample_id), path("${sample_id}.kraken2.tsv"),    emit: classified
+    // If you also produce a Krona HTML, add it as a separate line:
+    // tuple val(sample_id), path("${sample_id}.krona.html"),    emit: krona
 
   when:
-    params.kraken2_db && params.kraken2_db != ""
+    params.kraken2_db != null
 
   script:
   """
   set -eo pipefail
-  kraken2 \\
-    --db ${params.kraken2_db} \\
-    --threads ${task.cpus ?: 4} \\
-    --report ${sample_id}.kraken2.report \\
-    --output ${sample_id}.kraken2.tsv \\
-    --gzip-compressed \\
-    ${reads}
+  kraken2 --db ${params.kraken2_db} \
+          --threads ${task.cpus} \
+          --report "${sample_id}.kraken2.report" \
+          --output "${sample_id}.kraken2.tsv" \
+          "${reads}"
+
+  # Optional: Krona (if installed and desired)
+  # cut -f2,3 "${sample_id}.kraken2.tsv" | ktImportTaxonomy -o "${sample_id}.krona.html" -
   """
 }
 
@@ -305,10 +307,9 @@ process GTDBTK_CLASSIFY {
     tuple val(sample_id), path(assembly)
 
   output:
-    tuple val(sample_id), \
-         path("${sample_id}_gtdbtk_summary.tsv"),      emit: summary, \
-         path("${sample_id}_gtdbtk_classification.tsv"), emit: classification, \
-         path("${sample_id}_gtdbtk_logs"),               emit: logs_dir
+    tuple val(sample_id), path("${sample_id}_gtdbtk_summary.tsv"),      emit: summary
+    tuple val(sample_id), path("${sample_id}_gtdbtk_classification.tsv"), emit: classification
+    tuple val(sample_id), path("${sample_id}_gtdbtk_logs"),               emit: logs_dir
 
   when:
     params.gtdbtk_db && params.gtdbtk_db != ""
