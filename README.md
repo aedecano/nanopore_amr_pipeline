@@ -5,7 +5,7 @@ A modular, reproducible Nextflow DSL2 workflow for identifying bacterial species
 ## Features
 1. Modular DSL2 pipeline with process-specific scripts
 
-2. Species classification via GTDB-Tk, Kraken2, FastANI
+2. Species classification via GTDB-Tk and Kraken2
 
 3. AMR gene detection using Abricate (ResFinder only)
 
