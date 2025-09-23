@@ -18,11 +18,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Nextflow workflow report for run id [kickass_ritchie]">
+  <meta name="description" content="Nextflow workflow report for run id [soggy_franklin]">
   <meta name="author" content="Paolo Di Tommaso, Phil Ewels">
   <link rel="icon" type="image/png" href="https://www.nextflow.io/img/favicon.png" />
 
-  <title>[kickass_ritchie] Nextflow Workflow Report</title>
+  <title>[soggy_franklin] Nextflow Workflow Report</title>
 
   <style type="text/css">
   /*!
@@ -137,7 +137,7 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
         <li class="nav-item"><a class="nav-link" href="#tasks">Tasks</a></li>
       </ul>
       <span class="navbar-text">
-        [kickass_ritchie]
+        [soggy_franklin]
       </span>
     </div>
   </nav>
@@ -146,22 +146,46 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
     <div class="container">
 
       <h1 class="display-3">Nextflow workflow report</h1>
-      <h2 class="text-muted mb-4"><samp>[kickass_ritchie]</samp> </h2>
+      <h2 class="text-muted mb-4"><samp>[soggy_franklin]</samp> </h2>
 
       
           <div class="alert alert-danger mb-4">
               <h4>Workflow execution completed unsuccessfully!</h4>
-              <p>The exit status of the task that caused the workflow execution to fail was: <code>null</code>.</p>
+              <p>The exit status of the task that caused the workflow execution to fail was: <code>1</code>.</p>
               <p>The full error message was:</p>
-              <pre>/Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/ONT_Kpn_FQ</pre>
+              <pre>Error executing process > 'assembly_amr_pangenome:NANOPLOT_RAW (ERR8958704)'
+
+Caused by:
+  Process `assembly_amr_pangenome:NANOPLOT_RAW (ERR8958704)` terminated with an error exit status (1)
+
+
+Command executed:
+
+  set -eo pipefail
+  mkdir -p "ERR8958704_nanoplot_raw"
+  NanoPlot --fastq "ERR8958704.fastq.gz" --n50 --loglength --threads 2 -o "ERR8958704_nanoplot_raw"
+
+Command exit status:
+  1
+
+Command output:
+  (empty)
+
+Command error:
+  nxf_trace: .command.run: Permission denied
+
+Work dir:
+  /Users/arundecano/.nxf_work/bd/a2665e3069245a7338d23e54141621
+
+Tip: view the complete command output by changing to the process work dir and entering the command `cat .command.out`</pre>
           </div>
       
 
       <dl>
         <dt>Run times</dt>
         <dd>
-          <span id="workflow_start">05-Sep-2025 16:32:03</span> - <span id="workflow_complete">05-Sep-2025 16:32:05</span>
-          (<span id="completed_fromnow"></span>duration: <strong>1.8s</strong>)
+          <span id="workflow_start">17-Sep-2025 14:17:22</span> - <span id="workflow_complete">17-Sep-2025 14:17:46</span>
+          (<span id="completed_fromnow"></span>duration: <strong>23.6s</strong>)
         </dd>
 
         <dl>
@@ -169,12 +193,12 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
             <div style="width: 0.0%" class="progress-bar bg-success" data-toggle="tooltip" data-placement="top" title="0 tasks succeeded"><span class="text-truncate">&nbsp; 0 succeeded &nbsp;</span></div>
             <div style="width: 0.0%" class="progress-bar bg-secondary" data-toggle="tooltip" data-placement="top" title="0 tasks were cached"><span class="text-truncate">&nbsp; 0 cached &nbsp;</span></div>
             <div style="width: 0.0%" class="progress-bar bg-warning" data-toggle="tooltip" data-placement="top" title="0 tasks failed and were ignored"><span class="text-truncate">&nbsp; 0 ignored &nbsp;</span></div>
-            <div style="width: 0.0%" class="progress-bar bg-danger" data-toggle="tooltip" data-placement="top" title="0 tasks failed"><span class="text-truncate">&nbsp; 0 failed (0 retries) &nbsp;</span></div>
+            <div style="width: 100.0%" class="progress-bar bg-danger" data-toggle="tooltip" data-placement="top" title="3 tasks failed"><span class="text-truncate">&nbsp; 3 failed (0 retries) &nbsp;</span></div>
           </div>
         </dl>
 
         <dt>Nextflow command</dt>
-        <dd><pre class="nfcommand"><code>nextflow run main.nf -entry assembly_amr_pangenome --reads ONT_Kpn_FQ/ --outdir ../OUT_results --ref ../ONT_Kpn_FQ/Kpn_ref_MGH78578.fna</code></pre></dd>
+        <dd><pre class="nfcommand"><code>nextflow run main.nf --reads '/Users/arundecano/Documents/Github_aedecano_repos/ONT_Kpn_FQ/*.fastq.gz'</code></pre></dd>
       </dl>
 
       <dl class="row small">
@@ -185,7 +209,7 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
         <dd class="col-sm-9"><samp>/Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline</samp></dd>
 
         <dt class="col-sm-3">Work directory</dt>
-        <dd class="col-sm-9"><samp>/Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/work</samp></dd>
+        <dd class="col-sm-9"><samp>/Users/arundecano/.nxf_work</samp></dd>
 
         <dt class="col-sm-3">Project directory</dt>
         <dd class="col-sm-9"><samp>/Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline</samp></dd>
@@ -197,11 +221,11 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
 
         
           <dt class="col-sm-3">Script ID</dt>
-          <dd class="col-sm-9"><code>aee909f992eee74661a9a174fc966989</code></dd>
+          <dd class="col-sm-9"><code>0351ad8f31ba2d9ec86318f583aab727</code></dd>
         
 
         <dt class="col-sm-3">Workflow session</dt>
-        <dd class="col-sm-9"><code>7db15512-9006-4f4d-b492-a63ff657973c</code></dd>
+        <dd class="col-sm-9"><code>0f260784-b8bb-4cf8-b295-d97160a1146d</code></dd>
 
         
 
@@ -213,7 +237,7 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
         
 
         <dt class="col-sm-3">Nextflow version</dt>
-        <dd class="col-sm-9">version 25.04.6, build 5954 (01-07-2025 11:27 UTC)</dd>
+        <dd class="col-sm-9">version 25.04.7, build 5955 (08-09-2025 13:29 UTC)</dd>
       </dl>
     </div>
   </div>
@@ -345,7 +369,7 @@ table.DTCR_clonedTable.dataTable{position:absolute !important;background-color:r
 
   <footer>
     <div class="container-fluid">
-      Generated by <a href="https://www.nextflow.io" target="_blank">Nextflow</a>, version 25.04.6
+      Generated by <a href="https://www.nextflow.io" target="_blank">Nextflow</a>, version 25.04.7
     </div>
   </footer>
 
@@ -1035,7 +1059,7 @@ $(function() {
 
   // Nextflow report data
   window.data = { "trace":[
-], "summary":[] };
+{"task_id":"2","hash":"bd\/a2665e","native_id":"4533","process":"assembly_amr_pangenome:NANOPLOT_RAW","module":"-","container":"-","tag":"ERR8958704","name":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958704)","status":"FAILED","exit":"1","submit":"1758115065064","start":"1758115065095","complete":"1758115065931","duration":"867","realtime":"836","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/Users\/arundecano\/.nxf_work\/bd\/a2665e3069245a7338d23e54141621","script":"\n  set -eo pipefail\n  mkdir -p \"ERR8958704_nanoplot_raw\"\n  NanoPlot --fastq \"ERR8958704.fastq.gz\" --n50 --loglength --threads 2 -o \"ERR8958704_nanoplot_raw\"\n  ","scratch":"-","queue":"-","cpus":"2","memory":"4294967296","disk":"-","time":"7200000","env":"PATH=$PATH:\/Users\/arundecano\/Documents\/Github_aedecano_repos\/nanopore_amr_pipeline\/bin\n","error_action":"TERMINATE","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"},{"task_id":"7","hash":"5d\/4796b6","native_id":"4535","process":"assembly_amr_pangenome:NANOPLOT_RAW","module":"-","container":"-","tag":"ERR8958717","name":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958717)","status":"ABORTED","exit":"-","submit":"1758115065073","start":"1758115065098","complete":"-","duration":"-","realtime":"-","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/Users\/arundecano\/.nxf_work\/5d\/4796b68c98daaa6dffebc5af4e8b15","script":"\n  set -eo pipefail\n  mkdir -p \"ERR8958717_nanoplot_raw\"\n  NanoPlot --fastq \"ERR8958717.fastq.gz\" --n50 --loglength --threads 2 -o \"ERR8958717_nanoplot_raw\"\n  ","scratch":"-","queue":"-","cpus":"2","memory":"4294967296","disk":"-","time":"7200000","env":"PATH=$PATH:\/Users\/arundecano\/Documents\/Github_aedecano_repos\/nanopore_amr_pipeline\/bin\n","error_action":"-","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"},{"task_id":"8","hash":"57\/0d8238","native_id":"4539","process":"assembly_amr_pangenome:NANOPLOT_RAW","module":"-","container":"-","tag":"ERR8958700","name":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958700)","status":"FAILED","exit":"1","submit":"1758115065078","start":"1758115065099","complete":"1758115065983","duration":"905","realtime":"884","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/Users\/arundecano\/.nxf_work\/57\/0d82385a2f204d71d071dfeb0598b1","script":"\n  set -eo pipefail\n  mkdir -p \"ERR8958700_nanoplot_raw\"\n  NanoPlot --fastq \"ERR8958700.fastq.gz\" --n50 --loglength --threads 2 -o \"ERR8958700_nanoplot_raw\"\n  ","scratch":"-","queue":"-","cpus":"2","memory":"4294967296","disk":"-","time":"7200000","env":"PATH=$PATH:\/Users\/arundecano\/Documents\/Github_aedecano_repos\/nanopore_amr_pipeline\/bin\n","error_action":"TERMINATE","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"},{"task_id":"6","hash":"93\/22eb38","native_id":"4541","process":"assembly_amr_pangenome:NANOPLOT_RAW","module":"-","container":"-","tag":"ERR8958706","name":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958706)","status":"FAILED","exit":"1","submit":"1758115065083","start":"1758115065101","complete":"1758115065963","duration":"880","realtime":"862","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/Users\/arundecano\/.nxf_work\/93\/22eb38e6fd08bcb37d6dc1029a16ec","script":"\n  set -eo pipefail\n  mkdir -p \"ERR8958706_nanoplot_raw\"\n  NanoPlot --fastq \"ERR8958706.fastq.gz\" --n50 --loglength --threads 2 -o \"ERR8958706_nanoplot_raw\"\n  ","scratch":"-","queue":"-","cpus":"2","memory":"4294967296","disk":"-","time":"7200000","env":"PATH=$PATH:\/Users\/arundecano\/Documents\/Github_aedecano_repos\/nanopore_amr_pipeline\/bin\n","error_action":"TERMINATE","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"},{"task_id":"4","hash":"70\/80837a","native_id":"4698","process":"assembly_amr_pangenome:NANOPLOT_RAW","module":"-","container":"-","tag":"ERR8958737","name":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958737)","status":"ABORTED","exit":"-","submit":"1758115065939","start":"1758115065965","complete":"-","duration":"-","realtime":"-","%cpu":"-","%mem":"-","rss":"-","vmem":"-","peak_rss":"-","peak_vmem":"-","rchar":"-","wchar":"-","syscr":"-","syscw":"-","read_bytes":"-","write_bytes":"-","attempt":"1","workdir":"\/Users\/arundecano\/.nxf_work\/70\/80837a986857d82ca5088e3ebc6c9f","script":"\n  set -eo pipefail\n  mkdir -p \"ERR8958737_nanoplot_raw\"\n  NanoPlot --fastq \"ERR8958737.fastq.gz\" --n50 --loglength --threads 2 -o \"ERR8958737_nanoplot_raw\"\n  ","scratch":"-","queue":"-","cpus":"2","memory":"4294967296","disk":"-","time":"7200000","env":"PATH=$PATH:\/Users\/arundecano\/Documents\/Github_aedecano_repos\/nanopore_amr_pipeline\/bin\n","error_action":"-","vol_ctxt":"-","inv_ctxt":"-","hostname":"-","cpu_model":"-"}], "summary":[{"cpuUsage":null,"process":"NANOPLOT_RAW","mem":null,"memUsage":null,"timeUsage":{"mean":0.01,"min":0.01,"q1":0.01,"q2":0.01,"q3":0.01,"max":0.01,"minLabel":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958704)","maxLabel":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958700)","q1Label":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958704)","q2Label":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958706)","q3Label":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958706)"},"vmem":null,"reads":null,"cpu":null,"time":{"mean":860.67,"min":836,"q1":849,"q2":862,"q3":873,"max":884,"minLabel":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958704)","maxLabel":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958700)","q1Label":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958704)","q2Label":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958706)","q3Label":"assembly_amr_pangenome:NANOPLOT_RAW (ERR8958706)"},"writes":null}] };
 
   </script>
 
