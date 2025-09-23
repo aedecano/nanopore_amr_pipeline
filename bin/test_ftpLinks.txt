@@ -1,2 +1,0 @@
-SAMD00000344	/ebi/ftp/pub/databases/ENA2018-bacteria-661k/Assemblies/batch_000/SAMD00000344.contigs.fa.gz
-SAMD00000345	/ebi/ftp/pub/databases/ENA2018-bacteria-661k/Assemblies/batch_000/SAMD00000345.contigs.fa.gz
