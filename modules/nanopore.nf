@@ -4,6 +4,7 @@ nextflow.enable.dsl = 2
 process NANOPLOT_RAW {
   tag "$sample_id"
   label 'light'
+  conda 'bioconda::nanoplot=1.42.0'
   publishDir "${params.outdir}/nanoplot_raw", mode: 'copy'
 
   input:
@@ -24,6 +25,7 @@ process NANOPLOT_RAW {
 process FILTLONG {
   tag "$sample_id"
   label 'light'
+  conda 'bioconda::filtlong=0.2.1'
   publishDir "${params.outdir}/filtlong", mode: 'copy'
 
   input:
@@ -46,6 +48,7 @@ process FILTLONG {
 process NANOPLOT_FILT {
   tag "$sample_id"
   label 'light'
+  conda 'bioconda::nanoplot=1.42.0'
   publishDir "${params.outdir}/nanoplot_filt", mode: 'copy'
 
   input:
@@ -66,6 +69,7 @@ process NANOPLOT_FILT {
 process FLYE {
   tag "$sample_id"
   label 'heavy'
+  conda 'bioconda::flye=2.9.4'
   publishDir "${params.outdir}/flye", mode: 'copy'
 
   input:
@@ -88,6 +92,7 @@ process FLYE {
 process ABRICATE {
   tag "$sample_id"
   label 'light'
+  conda 'bioconda::abricate=1.0.1'
   publishDir "${params.outdir}/abricate", mode: 'copy'
 
   input:
@@ -155,6 +160,7 @@ process MERGE_ABRICATE {
 process BAKTA {
   tag "$sample_id"
   label 'medium'
+  conda 'bioconda::bakta=1.9.4'
   publishDir "${params.outdir}/bakta", mode: 'copy'
 
   input:
@@ -203,6 +209,7 @@ process PANAROO {
 process RAXML_NG {
   tag "raxml"
   label 'heavy'
+  conda 'bioconda::raxml-ng=1.2.2'
   publishDir "${params.outdir}/phylo", mode: 'copy'
 
   input:
@@ -224,6 +231,7 @@ process RAXML_NG {
 process IQTREE2 {
   tag "iqtree2"
   label 'heavy'
+  conda 'bioconda::iqtree=2.3.5'
   publishDir "${params.outdir}/phylo_iqtree", mode: 'copy'
 
   input:
@@ -246,6 +254,7 @@ process IQTREE2 {
 process MULTIQC {
   tag "multiqc"
   label 'light'
+  conda 'bioconda::multiqc=1.25'
   publishDir "${params.outdir}/multiqc", mode: 'copy'
 
   input:
@@ -269,6 +278,7 @@ process MULTIQC {
 process KRAKEN2 {
   tag "$sample_id"
   label 'light'
+  conda 'bioconda::kraken2=2.1.3'
   publishDir "${params.outdir}/kraken2", mode: 'copy'
 
   input:
@@ -301,6 +311,7 @@ process KRAKEN2 {
 process GTDBTK_CLASSIFY {
   tag "$sample_id"
   label 'heavy'
+  conda 'bioconda::gtdbtk=2.4.0'
   publishDir "${params.outdir}/gtdbtk", mode: 'copy'
 
   input:
