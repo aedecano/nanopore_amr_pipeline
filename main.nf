@@ -8,7 +8,7 @@ params.gtdbtk_db  = params.gtdbtk_db  ?: null
 params.reads  = params.reads ?: null
 params.outdir = params.outdir ?: 'results'
 
-// -------- Channels (TOP LEVEL) --------
+// -------- Channels --------
 Channel
   .fromPath(params.reads, checkIfExists: true)
   .ifEmpty { error "No reads found for: ${params.reads}" }
