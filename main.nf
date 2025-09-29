@@ -67,6 +67,7 @@ workflow assembly_amr_pangenome {
     mqc_inputs = np_raw.report_dir.map { _, d -> d }
                 .mix( quast.report_dir.map { _, d -> d } )
                 .mix( np_filt.report_dir.map { _, d -> d } )
+                .mix( kraken.report.map { _, f -> f } )
                 .mix( abri.tsv.map { _, f -> f } )
                 .collect()
     mqc = MULTIQC(mqc_inputs)
