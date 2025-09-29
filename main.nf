@@ -1,6 +1,6 @@
 nextflow.enable.dsl = 2
 
-include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; ABRICATE; ABRICATE_TAG; MERGE_ABRICATE; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
+include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG; MERGE_ABRICATE; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
 
 // -------- Params --------
 params.kraken2_db = params.kraken2_db ?: null
@@ -34,8 +34,17 @@ workflow assembly_amr_pangenome {
     filt     = FILTLONG(reads)            // -> (sample_id, .filt.fastq.gz)
     np_filt  = NANOPLOT_FILT(filt.reads)
 
+    //Taxonomy from filtered reads (contamination check)
+    kraken = KRAKEN2(filt.reads)
+
     // Assemble
     flye     = FLYE(filt.reads)           // -> (sample_id, .contigs.fasta)
+
+    // Assembly evaluation
+    quast = QUAST(flye.assembly)
+
+    // Bandage exports (runs only for samples where a GFA exists)
+    bandage = BANDAGE_IMAGE(flye.graph)
 
     // ABRicate (per sample), tag, merge
     abri     = ABRICATE(flye.assembly)
@@ -56,6 +65,7 @@ workflow assembly_amr_pangenome {
 
     // MultiQC inputs: NanoPlot dirs and ABRicate TSVs (MultiQC parses both)
     mqc_inputs = np_raw.report_dir.map { _, d -> d }
+                .mix( quast.report_dir.map { _, d -> d } )
                 .mix( np_filt.report_dir.map { _, d -> d } )
                 .mix( abri.tsv.map { _, f -> f } )
                 .collect()
@@ -65,7 +75,17 @@ workflow assembly_amr_pangenome {
     nanoplot_raw_dirs    = np_raw.report_dir
     nanoplot_filt_dirs   = np_filt.report_dir
     filtered_reads       = filt.reads
+    kraken_report        = kraken.report
+    kraken_calls         = kraken.classified
     assemblies           = flye.assembly
+    gfa_files            = flye.graph
+    asm_info_files       = flye.info
+    quast_dir            = quast.report_dir
+    quast_tsv            = quast.report_tsv
+    quast_txt            = quast.report_txt
+    bandage_png         = bandage.png
+    bandage_svg         = bandage.svg
+    bandage_nodes_table = bandage.info
     abricate_per_sample  = abri.tsv
     abricate_summary     = abri.summary
     abricate_merged_tsv  = abri_merged.merged

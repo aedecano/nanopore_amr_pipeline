@@ -4,7 +4,9 @@ nextflow.enable.dsl = 2
 process NANOPLOT_RAW {
   tag "$sample_id"
   label 'light'
-  conda 'bioconda::nanoplot=1.42.0'
+  //conda 'bioconda::nanoplot=1.42.0'
+  //conda 'conda_setup/envs/qc.yaml'
+  conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
   publishDir "${params.outdir}/nanoplot_raw", mode: 'copy'
 
   input:
@@ -17,7 +19,7 @@ process NANOPLOT_RAW {
   """
   set -eo pipefail
   mkdir -p "${sample_id}_nanoplot_raw"
-  NanoPlot --fastq "${reads}" --n50 --loglength --threads ${task.cpus} -o "${sample_id}_nanoplot_raw"
+  NanoPlot --fastq "${reads}" --N50 --loglength --threads ${task.cpus} -o "${sample_id}_nanoplot_raw"
   """
 }
 
@@ -25,7 +27,8 @@ process NANOPLOT_RAW {
 process FILTLONG {
   tag "$sample_id"
   label 'light'
-  conda 'bioconda::filtlong=0.2.1'
+  //conda 'bioconda::filtlong=0.2.1'
+  conda "$HOME/.conda_envs_nf_cache/env-filtlong"
   publishDir "${params.outdir}/filtlong", mode: 'copy'
 
   input:
@@ -48,7 +51,9 @@ process FILTLONG {
 process NANOPLOT_FILT {
   tag "$sample_id"
   label 'light'
-  conda 'bioconda::nanoplot=1.42.0'
+  //conda 'bioconda::nanoplot=1.42.0'
+  //conda 'conda_setup/envs/qc.yaml'
+  conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
   publishDir "${params.outdir}/nanoplot_filt", mode: 'copy'
 
   input:
@@ -61,30 +66,104 @@ process NANOPLOT_FILT {
   """
   set -eo pipefail
   mkdir -p "${sample_id}_nanoplot_filt"
-  NanoPlot --fastq "${filt}" --n50 --loglength --threads ${task.cpus} -o "${sample_id}_nanoplot_filt"
+  NanoPlot --fastq "${filt}" --N50 --loglength --threads ${task.cpus} -o "${sample_id}_nanoplot_filt"
   """
 }
 
 // ------------- Flye assembly -------------
 process FLYE {
   tag "$sample_id"
-  label 'heavy'
-  conda 'bioconda::flye=2.9.4'
-  publishDir "${params.outdir}/flye", mode: 'copy'
+  label 'medium'
+  conda "$HOME/.conda_envs_nf_cache/env-flye"
+  publishDir "${params.outdir}/flye/${sample_id}", mode: 'copy'
 
   input:
     tuple val(sample_id), path(reads)
 
   output:
-    tuple val(sample_id), path("${sample_id}.contigs.fasta"), emit: assembly
+    tuple val(sample_id), path("${sample_id}.contigs.fasta"),        emit: assembly
+    tuple val(sample_id), path("${sample_id}_graph.gfa"),  optional: true, emit: graph
+    tuple val(sample_id), path("${sample_id}.assembly_info.txt"), optional: true, emit: info
 
   script:
   """
-  set -eo pipefail
+  set -euo pipefail
+
   test -s "${reads}" || { echo "Filtered reads missing/empty: ${reads}" >&2; exit 1; }
 
   flye --nano-raw "${reads}" --out-dir . --threads ${task.cpus}
+
+  # Standardize filenames for downstream rules
   mv assembly.fasta "${sample_id}.contigs.fasta"
+
+  if [[ -s assembly_graph.gfa ]]; then
+    cp assembly_graph.gfa "${sample_id}_graph.gfa"
+  fi
+
+  if [[ -s assembly_info.txt ]]; then
+    cp assembly_info.txt "${sample_id}.assembly_info.txt"
+  fi
+  """
+}
+
+// ------------- QUAST (assembly evaluation) -------------
+process QUAST {
+  tag "$sample_id"
+  label 'medium'
+  
+  conda "$HOME/.conda_envs_nf_cache/env-quast-x64"
+  publishDir "${params.outdir}/quast/${sample_id}", mode: 'copy'
+
+  input:
+    tuple val(sample_id), path(assembly)
+
+  output:
+    tuple val(sample_id), path("${sample_id}_quast"),                            emit: report_dir
+    tuple val(sample_id), path("${sample_id}_quast/report.tsv"), optional: true, emit: report_tsv
+    tuple val(sample_id), path("${sample_id}_quast/report.txt"), optional: true, emit: report_txt
+
+  script:
+  """
+  set -euo pipefail
+  mkdir -p ${sample_id}_quast
+
+  #if command -v quast.py >/dev/null 2>&1; then
+    #quast.py "${assembly}" -o "${sample_id}_quast" -t ${task.cpus} --no-check --silent
+  #else
+    quast    "${assembly}" -o "${sample_id}_quast" -t ${task.cpus} --no-check --silent
+  #fi
+  """
+}
+
+// ------------- Bandage (export images & node table) -------------
+process BANDAGE_IMAGE {
+  tag "$sample_id"
+  label 'graph'
+  publishDir "${params.outdir}/bandage/${sample_id}", mode: 'copy'
+
+  input:
+    tuple val(sample_id), path(gfa)
+
+  output:
+    tuple val(sample_id), path("${sample_id}_graph.png"),                 emit: png
+    tuple val(sample_id), path("${sample_id}_graph.svg"),  optional: true, emit: svg
+    tuple val(sample_id), path("${sample_id}_graph_nodes.txt"), optional: true, emit: info
+
+  script:
+  """
+  set -euo pipefail
+  test -s "${gfa}" || { echo "Missing or empty GFA: ${gfa}" >&2; exit 1; }
+
+  # PNG export
+  Bandage image "${gfa}" "${sample_id}_graph.png" --resolution ${params.bandage_resolution:-300} ${params.bandage_annotations ? '--annotations' : ''}
+
+  # SVG export (skip if build lacks --format)
+  if Bandage image --help 2>/dev/null | grep -q -- '--format'; then
+    Bandage image "${gfa}" "${sample_id}_graph.svg" --format svg ${params.bandage_annotations ? '--annotations' : ''}
+  fi
+
+  # Node/coverage table export (optional)
+  Bandage info "${gfa}" "${sample_id}_graph_nodes.txt" || true
   """
 }
 
@@ -92,7 +171,7 @@ process FLYE {
 process ABRICATE {
   tag "$sample_id"
   label 'light'
-  conda 'bioconda::abricate=1.0.1'
+  //conda 'bioconda::abricate=1.0.1'
   publishDir "${params.outdir}/abricate", mode: 'copy'
 
   input:
@@ -254,7 +333,7 @@ process IQTREE2 {
 process MULTIQC {
   tag "multiqc"
   label 'light'
-  conda 'bioconda::multiqc=1.25'
+  //conda 'bioconda::multiqc=1.25'
   publishDir "${params.outdir}/multiqc", mode: 'copy'
 
   input:
@@ -278,7 +357,9 @@ process MULTIQC {
 process KRAKEN2 {
   tag "$sample_id"
   label 'light'
-  conda 'bioconda::kraken2=2.1.3'
+  
+  //conda 'bioconda::kraken2=2.1.3'
+  conda '$HOME/miniforge3/envs/kraken2'
   publishDir "${params.outdir}/kraken2", mode: 'copy'
 
   input:
