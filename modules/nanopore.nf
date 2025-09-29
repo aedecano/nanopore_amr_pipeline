@@ -138,32 +138,29 @@ process QUAST {
 // ------------- Bandage (export images & node table) -------------
 process BANDAGE_IMAGE {
   tag "$sample_id"
-  label 'graph'
+  label 'medium'
+  //conda 'bioconda::bandage=0.8.1'
   publishDir "${params.outdir}/bandage/${sample_id}", mode: 'copy'
 
   input:
-    tuple val(sample_id), path(gfa)
+    tuple val(sample_id), path(graph)
 
   output:
-    tuple val(sample_id), path("${sample_id}_graph.png"),                 emit: png
-    tuple val(sample_id), path("${sample_id}_graph.svg"),  optional: true, emit: svg
-    tuple val(sample_id), path("${sample_id}_graph_nodes.txt"), optional: true, emit: info
+    tuple val(sample_id), path("${sample_id}_bandage.png"),      optional: true, emit: png
+    tuple val(sample_id), path("${sample_id}_bandage.svg"),      optional: true, emit: svg
+    tuple val(sample_id), path("${sample_id}_bandage_nodes.txt"), optional: true, emit: info
+
+  when:
+    graph.size() > 0
 
   script:
   """
-  set -euo pipefail
-  test -s "${gfa}" || { echo "Missing or empty GFA: ${gfa}" >&2; exit 1; }
+  set -eo pipefail
+  test -s "${graph}" || { echo "Input GFA missing/empty: ${graph}" >&2; exit 1; }
 
-  # PNG export
-  Bandage image "${gfa}" "${sample_id}_graph.png" --resolution ${params.bandage_resolution:-300} ${params.bandage_annotations ? '--annotations' : ''}
-
-  # SVG export (skip if build lacks --format)
-  if Bandage image --help 2>/dev/null | grep -q -- '--format'; then
-    Bandage image "${gfa}" "${sample_id}_graph.svg" --format svg ${params.bandage_annotations ? '--annotations' : ''}
-  fi
-
-  # Node/coverage table export (optional)
-  Bandage info "${gfa}" "${sample_id}_graph_nodes.txt" || true
+  Bandage image "${graph}" "${sample_id}_bandage.png" --width 2000 --height 2000 
+  Bandage image "${graph}" "${sample_id}_bandage.svg"  
+  Bandage info "${graph}" > "${sample_id}_bandage_nodes.txt"
   """
 }
 

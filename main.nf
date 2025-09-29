@@ -35,7 +35,7 @@ workflow assembly_amr_pangenome {
     np_filt  = NANOPLOT_FILT(filt.reads)
 
     //Taxonomy from filtered reads (contamination check)
-    kraken = KRAKEN2(filt.reads)
+    //kraken = KRAKEN2(filt.reads)
 
     // Assemble
     flye     = FLYE(filt.reads)           // -> (sample_id, .contigs.fasta)
@@ -67,7 +67,7 @@ workflow assembly_amr_pangenome {
     mqc_inputs = np_raw.report_dir.map { _, d -> d }
                 .mix( quast.report_dir.map { _, d -> d } )
                 .mix( np_filt.report_dir.map { _, d -> d } )
-                .mix( kraken.report.map { _, f -> f } )
+                //.mix( kraken.report.map { _, f -> f } )
                 .mix( abri.tsv.map { _, f -> f } )
                 .collect()
     mqc = MULTIQC(mqc_inputs)
@@ -76,8 +76,8 @@ workflow assembly_amr_pangenome {
     nanoplot_raw_dirs    = np_raw.report_dir
     nanoplot_filt_dirs   = np_filt.report_dir
     filtered_reads       = filt.reads
-    kraken_report        = kraken.report
-    kraken_calls         = kraken.classified
+    //kraken_report        = kraken.report
+    //kraken_calls         = kraken.classified
     assemblies           = flye.assembly
     gfa_files            = flye.graph
     asm_info_files       = flye.info
