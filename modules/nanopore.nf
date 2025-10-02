@@ -7,7 +7,7 @@ process NANOPLOT_RAW {
   //conda 'bioconda::nanoplot=1.42.0'
   //conda 'conda_setup/envs/qc.yaml'
   //conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
-  conda 'conda_setup/envs1/nanoplot.yaml'
+  conda 'conda_setup/envs/nanoplot.yaml'
   publishDir "${params.outdir}/nanoplot_raw", mode: 'copy'
 
   input:
@@ -30,7 +30,7 @@ process FILTLONG {
   label 'light'
   //conda 'bioconda::filtlong=0.2.1'
   //conda "$HOME/.conda_envs_nf_cache/env-filtlong"
-  conda 'conda_setup/envs1/filtlong.yaml'
+  conda 'conda_setup/envs/filtlong.yaml'
   publishDir "${params.outdir}/filtlong", mode: 'copy'
 
   input:
@@ -55,7 +55,7 @@ process NANOPLOT_FILT {
   label 'light'
   //conda 'bioconda::nanoplot=1.42.0'
   //conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
-  conda 'conda_setup/envs1/nanoplot.yaml'
+  conda 'conda_setup/envs/nanoplot.yaml'
   publishDir "${params.outdir}/nanoplot_filt", mode: 'copy'
 
   input:
@@ -77,7 +77,7 @@ process FLYE {
   tag "$sample_id"
   label 'medium'
   //conda "$HOME/.conda_envs_nf_cache/env-flye"
-  conda 'conda_setup/envs1/flye.yaml'
+  conda 'conda_setup/envs/flye.yaml'
   publishDir "${params.outdir}/flye/${sample_id}", mode: 'copy'
 
   input:
@@ -115,7 +115,7 @@ process QUAST {
   label 'medium'
   
   //conda "$HOME/.conda_envs_nf_cache/env-quast-x64"
-  conda 'conda_setup/envs1/quast.yaml'
+  conda 'conda_setup/envs/quast.yaml'
   publishDir "${params.outdir}/quast/${sample_id}", mode: 'copy'
 
   input:
@@ -145,7 +145,7 @@ process BANDAGE_IMAGE {
   label 'medium'
   
   //conda 'bioconda::bandage=0.8.1'
-  conda 'conda_setup/envs1/bandage.yaml'
+  conda 'conda_setup/envs/bandage.yaml'
 
   publishDir "${params.outdir}/bandage/${sample_id}", mode: 'copy'
 
@@ -176,7 +176,7 @@ process ABRICATE {
   tag "$sample_id"
   label 'light'
   
-  conda 'conda_setup/envs1/abricate.yaml'
+  conda 'conda_setup/envs/abricate.yaml'
   publishDir "${params.outdir}/abricate", mode: 'copy'
 
   input:
@@ -370,7 +370,7 @@ process MULTIQC {
   tag "multiqc"
   label 'light'
   //conda 'bioconda::multiqc=1.25'
-  conda 'conda_setup/envs1/multiqc.yaml'
+  conda 'conda_setup/envs/multiqc.yaml'
   publishDir "${params.outdir}/multiqc", mode: 'copy'
 
   input:
@@ -397,7 +397,7 @@ process KRAKEN2 {
   
   //conda 'bioconda::kraken2=2.1.3'
   //conda '$HOME/miniforge3/envs/kraken2'
-  conda './conda_setup/envs1/kraken2.yaml'
+  conda './conda_setup/envs/kraken2.yaml'
   publishDir "${params.outdir}/kraken2", mode: 'copy'
 
   input:
