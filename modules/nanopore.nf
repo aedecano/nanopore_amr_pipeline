@@ -6,7 +6,8 @@ process NANOPLOT_RAW {
   label 'light'
   //conda 'bioconda::nanoplot=1.42.0'
   //conda 'conda_setup/envs/qc.yaml'
-  conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
+  //conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
+  conda 'conda_setup/envs1/nanoplot.yaml'
   publishDir "${params.outdir}/nanoplot_raw", mode: 'copy'
 
   input:
@@ -28,7 +29,8 @@ process FILTLONG {
   tag "$sample_id"
   label 'light'
   //conda 'bioconda::filtlong=0.2.1'
-  conda "$HOME/.conda_envs_nf_cache/env-filtlong"
+  //conda "$HOME/.conda_envs_nf_cache/env-filtlong"
+  conda 'conda_setup/envs1/filtlong.yaml'
   publishDir "${params.outdir}/filtlong", mode: 'copy'
 
   input:
@@ -52,8 +54,8 @@ process NANOPLOT_FILT {
   tag "$sample_id"
   label 'light'
   //conda 'bioconda::nanoplot=1.42.0'
-  //conda 'conda_setup/envs/qc.yaml'
-  conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
+  //conda "$HOME/.conda_envs_nf_cache/env-nf-qc"
+  conda 'conda_setup/envs1/nanoplot.yaml'
   publishDir "${params.outdir}/nanoplot_filt", mode: 'copy'
 
   input:
@@ -74,7 +76,8 @@ process NANOPLOT_FILT {
 process FLYE {
   tag "$sample_id"
   label 'medium'
-  conda "$HOME/.conda_envs_nf_cache/env-flye"
+  //conda "$HOME/.conda_envs_nf_cache/env-flye"
+  conda 'conda_setup/envs1/flye.yaml'
   publishDir "${params.outdir}/flye/${sample_id}", mode: 'copy'
 
   input:
@@ -111,7 +114,8 @@ process QUAST {
   tag "$sample_id"
   label 'medium'
   
-  conda "$HOME/.conda_envs_nf_cache/env-quast-x64"
+  //conda "$HOME/.conda_envs_nf_cache/env-quast-x64"
+  conda 'conda_setup/envs1/quast.yaml'
   publishDir "${params.outdir}/quast/${sample_id}", mode: 'copy'
 
   input:
@@ -139,7 +143,10 @@ process QUAST {
 process BANDAGE_IMAGE {
   tag "$sample_id"
   label 'medium'
+  
   //conda 'bioconda::bandage=0.8.1'
+  conda 'conda_setup/envs1/bandage.yaml'
+
   publishDir "${params.outdir}/bandage/${sample_id}", mode: 'copy'
 
   input:
@@ -168,24 +175,29 @@ process BANDAGE_IMAGE {
 process ABRICATE {
   tag "$sample_id"
   label 'light'
-  //conda 'bioconda::abricate=1.0.1'
+  
+  conda 'conda_setup/envs1/abricate.yaml'
   publishDir "${params.outdir}/abricate", mode: 'copy'
 
   input:
     tuple val(sample_id), path(contigs)
 
   output:
-    tuple val(sample_id), path("${sample_id}.abricate.tsv"),         emit: tsv
-    tuple val(sample_id), path("${sample_id}.abricate.summary.tsv"), emit: summary
+    tuple val(sample_id), path("${sample_id}.abricate.amr.tsv"),               emit: amr_tsv
+    tuple val(sample_id), path("${sample_id}.abricate.summary.amr.tsv"),       emit: amr_summary
+    tuple val(sample_id), path("${sample_id}.abricate.plm.tsv"),               emit: plm_tsv
+    tuple val(sample_id), path("${sample_id}.abricate.summary.plm.tsv"),       emit: plm_summary
 
   when:
-    params.abricate_db != null
+    (params.abricate_db_amr != null) && (params.abricate_db_plm != null) 
 
   script:
   """
   set -eo pipefail
-  abricate --db ${params.abricate_db} "${contigs}" > "${sample_id}.abricate.tsv"
-  abricate --summary "${sample_id}.abricate.tsv" > "${sample_id}.abricate.summary.tsv"
+  abricate --db ${params.abricate_db_amr} "${contigs}" > "${sample_id}.abricate.amr.tsv"
+  abricate --summary "${sample_id}.abricate.amr.tsv" > "${sample_id}.abricate.summary.amr.tsv"
+  abricate --db ${params.abricate_db_plm} "${contigs}" > "${sample_id}.abricate.plm.tsv"
+  abricate --summary "${sample_id}.abricate.plm.tsv" > "${sample_id}.abricate.summary.plm.tsv"
   """
 }
 
@@ -197,18 +209,19 @@ process ABRICATE_TAG {
 
   input:
     tuple val(sample_id), path(tsv)
+    val db_type
 
   output:
-    path("${sample_id}.abricate.tagged.tsv"), emit: tagged
+    path("${sample_id}.abricate.${db_type}.tagged.tsv"), emit: tagged
 
   script:
   """
   set -eo pipefail
   # Write header with a new leading 'sample_id' column
-  { printf "sample_id\\t"; head -n1 "${tsv}"; } > "${sample_id}.abricate.tagged.tsv"
+  { printf "sample_id\\t"; head -n1 "${tsv}"; } > "${sample_id}.abricate.${db_type}.tagged.tsv"
 
   # Append body rows, prefixing sample_id to each line
-  tail -n +2 "${tsv}" | sed "s/^/${sample_id}\\t/" >> "${sample_id}.abricate.tagged.tsv"
+  tail -n +2 "${tsv}" | sed "s/^/${sample_id}\\t/" >> "${sample_id}.abricate.${db_type}.tagged.tsv"
   """
 }
 
@@ -220,15 +233,16 @@ process MERGE_ABRICATE {
 
   input:
     path(tagged_tsvs)
+    val db_type
 
   output:
-    path("abricate_merged.tsv"), emit: merged
+    path("abricate_merged_${db_type}.tsv"), emit: merged
 
   script:
   """
   set -eo pipefail
   first=\$(ls -1 ${tagged_tsvs} | head -n1)
-  { head -n1 "\$first"; for f in ${tagged_tsvs}; do awk 'NR>1' "\$f"; done; } > abricate_merged.tsv
+  { head -n1 "\$first"; for f in ${tagged_tsvs}; do awk 'NR>1' "\$f"; done; } > abricate_merged_${db_type}.tsv
   """
 }
 
@@ -256,6 +270,31 @@ process BAKTA {
   set -eo pipefail
   bakta "${contigs}" --db ${params.bakta_db} --prefix "${sample_id}" --output "${PWD}" --threads ${task.cpus}
   test -f "${sample_id}.gff" && mv "${sample_id}.gff" "${sample_id}.gff3" || true
+  """
+}
+
+// ------------- Combine AMR and Plasmid ABRicate results -------------
+process COMBINE_ABRICATE_RESULTS {
+  tag "combine-abricate"
+  label 'light'
+  publishDir "${params.outdir}/abricate", mode: 'copy'
+
+  input:
+    path(amr_merged)
+    path(plm_merged)
+
+  output:
+    path("abricate_merged_all.tsv"), emit: combined
+
+  script:
+  """
+  set -eo pipefail
+  # Take header from AMR file
+  head -n1 "${amr_merged}" > abricate_merged_all.tsv
+  
+  # Append all data rows from both files (skip headers)
+  tail -n +2 "${amr_merged}" >> abricate_merged_all.tsv
+  tail -n +2 "${plm_merged}" >> abricate_merged_all.tsv
   """
 }
 
@@ -331,6 +370,7 @@ process MULTIQC {
   tag "multiqc"
   label 'light'
   //conda 'bioconda::multiqc=1.25'
+  conda 'conda_setup/envs1/multiqc.yaml'
   publishDir "${params.outdir}/multiqc", mode: 'copy'
 
   input:
@@ -356,7 +396,8 @@ process KRAKEN2 {
   label 'light'
   
   //conda 'bioconda::kraken2=2.1.3'
-  conda '$HOME/miniforge3/envs/kraken2'
+  //conda '$HOME/miniforge3/envs/kraken2'
+  conda './conda_setup/envs1/kraken2.yaml'
   publishDir "${params.outdir}/kraken2", mode: 'copy'
 
   input:
