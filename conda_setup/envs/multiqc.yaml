@@ -1,0 +1,8 @@
+name: nf-multiqc
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - multiqc=1.30

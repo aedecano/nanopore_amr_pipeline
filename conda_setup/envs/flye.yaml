@@ -1,0 +1,9 @@
+name: nf-flye
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - flye=2.9.5
+  # Optional: if Conda solver pulls in Python anyway, keep it flexible:
+  - python>=3.9

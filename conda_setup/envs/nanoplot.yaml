@@ -1,0 +1,23 @@
+name: nf-nanoplot
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.11
+  - nanoplot=1.41.6
+  - nanoget=1.19.3
+  - nanomath=1.4.0
+  - matplotlib-base
+  - plotly>=5
+  - pip
+  - python-kaleido        # use conda if available for your arch
+  - pip:
+      - iniconfig==2.1.0
+      - kaleido==0.2.1
+      - plotly==5.24.1
+      - pluggy==1.6.0
+      - pygments==2.19.2
+      - pytest==8.4.2
+      - pytest-timeout==2.4.0
+      - tenacity==9.1.2          # required for plotly
