@@ -1,6 +1,6 @@
 nextflow.enable.dsl = 2
 
-include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
+include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
 
 // -------- Params --------
 params.kraken2_db = params.kraken2_db ?: null
@@ -41,7 +41,7 @@ if( params.assemblies ) {
 
 // -------- Workflow: assembly_amr_pangenome --------
 // Takes nanopore reads (tuple: sample_id, reads), does QC, filtering, assembly,
-// assembly evaluation, AMR gene detection with ABRicate, annotation with Bakta,
+// assembly evaluation, AMR and plasmid gene detection with ABRicate, annotation with Bakta,
 // pangenome analysis with Panaroo, and generates a MultiQC report.
 
 workflow assembly_amr_pangenome {
@@ -65,14 +65,15 @@ workflow assembly_amr_pangenome {
     bandage = BANDAGE_IMAGE(flye.graph)
 
     // ABRicate (per sample), tag, merge
-    ab          = ABRICATE(flye.assembly)
-    tag_amr     = ABRICATE_TAG_AMR(ab.amr_tsv, 'amr')
-    tag_plm     = ABRICATE_TAG_PLM(ab.plm_tsv, 'plm')
-    merged_amr  = MERGE_ABRICATE_AMR(tag_amr.tagged.collect(), 'amr')
-    merged_plm  = MERGE_ABRICATE_PLM(tag_plm.tagged.collect(), 'plm')
-    combined    = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
-    abri_all    = ab.amr_tsv.mix(ab.plm_tsv).collect()
-    abri_merged = merged_amr.merged.mix(merged_plm.merged).collect()
+    ab              = ABRICATE(flye.assembly)
+    tag_amr         = ABRICATE_TAG_AMR(ab.amr_tsv, 'amr')
+    tag_plm         = ABRICATE_TAG_PLM(ab.plm_tsv, 'plm')
+    merged_amr      = MERGE_ABRICATE_AMR(tag_amr.tagged.collect(), 'amr')
+    merged_plm      = MERGE_ABRICATE_PLM(tag_plm.tagged.collect(), 'plm')
+    abri_all        = ab.amr_tsv.mix(ab.plm_tsv).collect()
+    abri_merged     = merged_amr.merged.mix(merged_plm.merged).collect()
+    combined        = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
+    abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined)
 
     // Bakta (per sample)
     // Bakta (per sample)
@@ -116,8 +117,10 @@ workflow assembly_amr_pangenome {
     abricate_plm_per_sample  = ab.plm_tsv
     abricate_plm_summary     = ab.plm_summary
     abricate_all_per_sample  = abri_all
-    abricate_merged_tsv  = abri_merged
-    abricate_combined    = combined.combined
+    abricate_merged_tsv      = abri_merged
+    abricate_combined        = combined.combined
+    abricate_summary_plots   = abri_summ_plots.plots
+    per_sample_summary       = abri_summ_plots.per_sample_summary
     //bakta_gff            = bakta.gff
     //core_alignment       = pana.core_alignment
     //raxml_tree           = raxml.besttree
@@ -151,7 +154,7 @@ workflow taxonomy_from_reads {
 // workflow { taxonomy_from_reads() }
 
 // -------- Workflow: amr_pangenome_from_assemblies --------
-// Takes assemblies (tuple: sample_id, assembly), runs ABRicate for AMR genes,
+// Takes assemblies (tuple: sample_id, assembly), runs ABRicate for AMR genes, plasmid genes,
 // annotates with Bakta, does pangenome analysis with Panaroo, and builds trees
 // from the core alignment with RAxML-NG and IQ-TREE2.
 

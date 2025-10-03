@@ -246,6 +246,58 @@ process MERGE_ABRICATE {
   """
 }
 
+// ------------- Combine AMR and Plasmid ABRicate results -------------
+process COMBINE_ABRICATE_RESULTS {
+  tag "combine-abricate"
+  label 'light'
+  publishDir "${params.outdir}/abricate", mode: 'copy'
+
+  input:
+    path(amr_merged)
+    path(plm_merged)
+
+  output:
+    path("abricate_merged_all.tsv"), emit: combined
+
+  script:
+  """
+  set -eo pipefail
+  # Take header from AMR file
+  head -n1 "${amr_merged}" > abricate_merged_all.tsv
+  
+  # Append all data rows from both files (skip headers)
+  tail -n +2 "${amr_merged}" >> abricate_merged_all.tsv
+  tail -n +2 "${plm_merged}" >> abricate_merged_all.tsv
+  """
+}
+
+process PLOT_SUMMARIZE_ABRICATE {
+  tag "abricate_summary"
+  label 'r_light'
+
+  conda 'conda_setup/envs/abricate_summary_plot.yaml'
+  publishDir "${params.outdir}/abricate_summary", mode: 'copy', overwrite: true
+
+  input:
+  path abricate_merged
+
+  output:
+  path "abricate_plots/*", emit: abricate_summary_plots
+  path "per_sample_amr_plasmid_summary.tsv", emit: per_sample_summary
+
+  when:
+  params.enable_abricate_summary
+
+  script:
+  """
+  Rscript bin/analyse_abricate.R \
+    -i ${abricate_merged} \
+    -o abricate_plots \
+    -n ${params.abricate_summary_topN} \
+    --gene_column ${params.abricate_summary_gene_column}
+  """
+}
+
 // ------------- Bakta (functional annotation) -------------
 process BAKTA {
   tag "$sample_id"
@@ -273,30 +325,7 @@ process BAKTA {
   """
 }
 
-// ------------- Combine AMR and Plasmid ABRicate results -------------
-process COMBINE_ABRICATE_RESULTS {
-  tag "combine-abricate"
-  label 'light'
-  publishDir "${params.outdir}/abricate", mode: 'copy'
 
-  input:
-    path(amr_merged)
-    path(plm_merged)
-
-  output:
-    path("abricate_merged_all.tsv"), emit: combined
-
-  script:
-  """
-  set -eo pipefail
-  # Take header from AMR file
-  head -n1 "${amr_merged}" > abricate_merged_all.tsv
-  
-  # Append all data rows from both files (skip headers)
-  tail -n +2 "${amr_merged}" >> abricate_merged_all.tsv
-  tail -n +2 "${plm_merged}" >> abricate_merged_all.tsv
-  """
-}
 
 // ------------- Panaroo (pangenome) -------------
 process PANAROO {
