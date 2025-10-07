@@ -1,6 +1,6 @@
 nextflow.enable.dsl = 2
 
-include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
+include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; MLST_CONTIGS_PS; MERGE_MLST; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
 
 // -------- Params --------
 params.kraken2_db = params.kraken2_db ?: null
@@ -9,17 +9,35 @@ params.reads  = params.reads ?: null
 params.outdir = params.outdir ?: 'results'
 
 // -------- Channels --------
-Channel.fromPath(params.reads, checkIfExists: true) // (sample_id, fastq.gz)
-       .ifEmpty { error "No reads found for: ${params.reads}" }
-       .map { f ->
-       def sid = f.name
-            .replaceFirst(/\.fastq\.gz$/, '')
-            .replaceFirst(/\.fq\.gz$/, '')
-            .replaceFirst(/\.fastq$/, '')
-            .replaceFirst(/\.fq$/, '')
-            tuple(sid, f)
-            } 
-       .set { reads } 
+
+def P = (params.reads ?: '').toString()
+log.info "CWD: ${java.nio.file.Paths.get('').toAbsolutePath()}"
+log.info "reads pattern: ${P}"
+
+// JVM-side checks (no globbing, just: can Java see this path?)
+def jf = new java.io.File(P)
+log.info "JavaFile.exists=${jf.exists()} isFile=${jf.isFile()} path=${jf.getPath()}"
+
+import java.nio.file.*
+try {
+  def np = Paths.get(P)
+  log.info "NIO Files.exists=${Files.exists(np)} isRegularFile=${Files.isRegularFile(np)}"
+} catch(Exception e) {
+  log.info "NIO check threw: ${e.class.name}: ${e.message}"
+}
+if( params.reads ) {
+  Channel.fromPath(params.reads, checkIfExists: true) // (sample_id, fastq.gz)
+         .ifEmpty { error "No reads found for: ${params.reads}" }
+         .map { f ->
+         def sid = f.name
+              .replaceFirst(/\.fastq\.gz$/, '')
+              .replaceFirst(/\.fq\.gz$/, '')
+              .replaceFirst(/\.fastq$/, '')
+              .replaceFirst(/\.fq$/, '')
+              tuple(sid, f)
+              } 
+         .set { reads } 
+}
 // Optional: drop empty files early
 // reads = reads.filter { sid, fq -> fq.size() > 0 }
 
@@ -75,7 +93,11 @@ workflow assembly_amr_pangenome {
     combined        = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
     abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined)
 
-    // Bakta (per sample)
+    // MLST (per sample, merge then summarise)
+    mlst = MLST_CONTIGS_PS(flye.assembly, params.mlst_scheme)
+    mlst_merged  = mlst.mlst_tsv.collect()
+    mlst_summary = mlst.mlst_summary(mlst_merged) 
+
     // Bakta (per sample)
     //bakta    = BAKTA(flye.assembly)
 
@@ -121,6 +143,9 @@ workflow assembly_amr_pangenome {
     abricate_combined        = combined.combined
     abricate_summary_plots   = abri_summ_plots.plots
     per_sample_summary       = abri_summ_plots.per_sample_summary
+    mlst_tsv                 = mlst.mlst_tsv
+    mlst_merged              = mlst.mlst_merged
+    mlst_summary             = mlst.mlst_summary
     //bakta_gff            = bakta.gff
     //core_alignment       = pana.core_alignment
     //raxml_tree           = raxml.besttree

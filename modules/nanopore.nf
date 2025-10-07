@@ -298,6 +298,96 @@ process PLOT_SUMMARIZE_ABRICATE {
   """
 }
 
+// ------------- MLST (from contigs per sample) -------------
+
+process MLST_CONTIGS_PS_0 {
+
+    tag {"MLST: ${assembly}"}
+
+    label 'mlst'
+    publishDir "$params.outdir/mlst/", mode: 'copy'
+    
+    input:
+    tuple val(sample_id), path(assembly)
+    
+    
+    output:
+    tuple val(sample_id), path("${sample_id}_ST.tsv"), emit: mlst_tsv
+
+    script:
+    """
+    mlst --scheme $params.mlstdb ${assembly} > ${sample_id}_ST.tsv
+    """
+
+}
+
+process MLST_CONTIGS_PS {
+  tag "$sample_id"
+  label 'light'
+  
+   conda 'conda_setup/envs/mlst.yaml'   // includes mlst, perl, blast, etc.
+  // container 'staphb/mlst:2.23.0'
+  publishDir "${params.outdir}/mlst", mode: 'copy'
+
+  
+
+  input:
+    tuple val(sample_id), path(contigs)
+    val mlst_scheme
+
+  output:
+    tuple val(sample_id), path("${sample_id}.mlst.tsv"), emit: mlst_tsv
+
+  script:
+  """
+  set -euo pipefail
+
+  # --- Robust Perl fix: ensure Conda's Perl libs are found if CONDA_PREFIX is set ---
+  if [[ -n "\${CONDA_PREFIX:-}" ]]; then
+    PERL_SITE="\${CONDA_PREFIX}/lib/perl5/site_perl"
+    PERL_VENDOR="\${CONDA_PREFIX}/lib/perl5/vendor_perl"
+    export PERL5LIB="\${PERL5LIB:+\${PERL5LIB}:}\${PERL_SITE}:\${PERL_VENDOR}"
+  fi
+
+  # Run mlst; prepend sample_id to ease merging
+  mlst --scheme ${params.mlst_scheme} "${contigs}" | awk -v sid="${sample_id}" 'BEGIN { OFS="\\t" } { print sid, \$0 }'  \\
+  > "${sample_id}.mlst.tsv"
+  """
+}
+
+// ------------- MLST MERGE (all samples) -------------
+process MERGE_MLST {
+  tag "merge-mlst"
+  label 'light'
+  // conda 'conda-forge::awk'
+  // (no special env needed; uses POSIX tools)
+  publishDir "${params.outdir}/mlst", mode: 'copy'
+
+  input:
+    path mlst_tsvs // List of *.mlst.tsv files (use .collect() upstream)
+
+  output:
+    path "mlst_merged_all.tsv",     emit: mlst_merged
+    path "mlst_summary_counts.tsv", emit: mlst_summary
+
+  script:
+  """
+  set -euo pipefail
+
+  # Header: sample + native mlst columns (file, scheme, ST, loci...)
+  echo -e "sample\\tfile\\tscheme\\tST\\talleles" > mlst_merged_all.tsv
+
+  # Append all rows
+  cat ${mlst_tsvs} >> mlst_merged_all.tsv
+
+  # Simple summary: counts per ST (ignores header)
+  awk -F'\\t' 'NR>1 { c[\$4]++ } END { print "ST\\tcount"; for (st in c) print st"\\t"c[st] }' \\
+    mlst_merged_all.tsv \\
+    | sort -k2,2nr -k1,1 \\
+    > mlst_summary_counts.tsv
+  """
+}
+
 // ------------- Bakta (functional annotation) -------------
 process BAKTA {
   tag "$sample_id"
