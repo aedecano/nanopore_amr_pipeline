@@ -149,16 +149,26 @@ workflow assembly_amr_pangenome {
     abricate_all_per_sample  = abri_all
     abricate_merged_tsv      = abri_merged
     abricate_combined        = combined.combined
-    abricate_summary_plots   = abri_summ_plots.plots
+    abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
     per_sample_summary       = abri_summ_plots.per_sample_summary
     mlst_tsv        = mlst.mlst_tsv
     mlst_merged     = merge_mlst.mlst_merged
     mlst_summary    = merge_mlst.mlst_summary  
-    bakta_gff                = bakta.gff
-    bakta_gbff               = bakta.gbff
-    bakta_faa                = bakta.proteins
-    bakta_ffn                = bakta.genes
-    //core_alignment       = pana.core_alignment
+    bakta_gff      = bakta.gff
+    bakta_tsv       = bakta.tsv
+    bakta_faa       = bakta.faa
+    bakta_ffn       = bakta.ffn
+    bakta_txt       = bakta.txt
+    bakta_json      = bakta.json
+    bakta_embl      = bakta.embl
+    bakta_gbff      = bakta.gbff
+    bakta_inference_tsv = bakta.inference_tsv
+    bakta_svg       = bakta.svg
+    bakta_png       = bakta.png
+    bakta_log       = bakta.log
+    core_alignment  = pana.fasta
+    roary_like      = pana.csv
+    graph           = pana.gml
     //raxml_tree           = raxml.besttree
     //iqtree_tree          = iq.treefile
     multiqc_report       = mqc.report
@@ -226,7 +236,7 @@ workflow amr_pangenome_from_assemblies {
               .map { gffs -> tuple(asm_ch.map{sid,_->sid}.toList().unique(), gffs) }
 
   // Panaroo + Piggy on the whole cohort
-  //panaroo = PANAROO_RUN(gff_list)
+  panaroo = PANAROO_RUN(gff_list)
  //piggy   = PIGGY_RUN(gff_list)
 
   // ----- Trees from Panaroo core alignment -----

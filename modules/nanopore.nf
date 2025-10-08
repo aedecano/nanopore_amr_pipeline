@@ -271,30 +271,30 @@ process COMBINE_ABRICATE_RESULTS {
   """
 }
 
+
+
 process PLOT_SUMMARIZE_ABRICATE {
   tag "abricate_summary"
   label 'r_light'
-
-  conda 'conda_setup/envs/abricate_summary_plot.yaml'
   publishDir "${params.outdir}/abricate_summary", mode: 'copy', overwrite: true
 
   input:
   path abricate_merged
 
   output:
-  path "abricate_plots/*", emit: abricate_summary_plots
-  path "per_sample_amr_plasmid_summary.tsv", emit: per_sample_summary
+  path "abricate_plots/*", optional: true, emit: abricate_summary_plots
+  path "per_sample_amr_plasmid_summary.tsv", optional: true, emit: per_sample_summary
 
   when:
   params.enable_abricate_summary
 
   script:
   """
-  Rscript bin/analyse_abricate.R \
+  analyse_abricate.R \
     -i ${abricate_merged} \
     -o abricate_plots \
-    -n ${params.abricate_summary_topN} \
-    --gene_column ${params.abricate_summary_gene_column}
+    -n ${params.abricate_summary_topN ?: 30} \
+    --gene_column ${params.abricate_summary_gene_column ?: 'PRODUCT'}
   """
 }
 
@@ -333,7 +333,7 @@ process MLST_CONTIGS_PS {
 
   input:
     tuple val(sample_id), path(contigs)
-    //val mlst_scheme
+    
 
   output:
     tuple val(sample_id), path("${sample_id}.mlst.tsv"), emit: mlst_tsv
@@ -389,34 +389,67 @@ process MERGE_MLST {
 }
 
 // ------------- Bakta (functional annotation) -------------
+
 process BAKTA {
   tag "$sample_id"
   label 'medium'
 
-  //conda 'bioconda::bakta=1.9.4'
-  conda 'conda_setup/envs/bakta.yaml'
-  publishDir "${params.outdir}/bakta", mode: 'copy'
+  publishDir "${params.outdir}/bakta/${sample_id}", mode: 'copy', overwrite: true
 
   input:
     tuple val(sample_id), path(contigs)
 
   output:
     tuple val(sample_id), path("${sample_id}.gff3"), emit: gff
+    tuple val(sample_id), path("${sample_id}.tsv"),  emit: tsv
+    tuple val(sample_id), path("${sample_id}.faa"),  emit: faa
+    tuple val(sample_id), path("${sample_id}.ffn"),  emit: ffn
+    tuple val(sample_id), path("${sample_id}.txt"),  emit: txt
+    tuple val(sample_id), path("${sample_id}.json"), emit: json
+    tuple val(sample_id), path("${sample_id}.embl"), emit: embl
     tuple val(sample_id), path("${sample_id}.gbff"), emit: gbff
-    tuple val(sample_id), path("${sample_id}.faa"),  emit: proteins
-    tuple val(sample_id), path("${sample_id}.ffn"),  emit: genes
+    tuple val(sample_id), path("${sample_id}.inference.tsv"),  emit: inference_tsv
+    tuple val(sample_id), path("${sample_id}.svg"), emit: svg
+    tuple val(sample_id), path("${sample_id}.png"), emit: png
+    tuple val(sample_id), path("${sample_id}.log"), emit: log
 
   when:
     params.bakta_db != null
 
   script:
+  def skipFlags = []
+  if (params.bakta_skip_crispr) skipFlags << '--skip-crispr'
+  if (params.bakta_skip_tmrna)  skipFlags << '--skip-tmrna'
+  if (params.bakta_skip_cds)    skipFlags << '--skip-cds'
+  if (params.bakta_skip_sorf)   skipFlags << '--skip-sorf'
+
   """
-  set -eo pipefail
-  bakta "${contigs}" --db ${params.bakta_db} --prefix "${sample_id}" --output "${PWD}" --threads ${task.cpus}
-  test -f "${sample_id}.gff" && mv "${sample_id}.gff" "${sample_id}.gff3" || true
+  set -euo pipefail
+
+  if [ ! -d "${params.bakta_db}" ]; then
+    echo "ERROR: Bakta database not found at: ${params.bakta_db}" >&2
+    exit 1
+  fi
+
+  bakta "${contigs}" \
+    --db "${params.bakta_db}" \
+    --prefix "${sample_id}" \
+    --output "." \
+    --threads ${task.cpus} \
+    --force \
+    ${skipFlags.join(' ')}
+
+  # Some versions emit ${sample_id}.gff; normalize to .gff3 for downstream
+  if [ -f "${sample_id}.gff" ] && [ ! -f "${sample_id}.gff3" ]; then
+    mv "${sample_id}.gff" "${sample_id}.gff3"
+  fi
+
+  # Make sure expected files exist even when certain features are skipped
+  : > "${sample_id}.tsv" || true
+  : > "${sample_id}.faa" || true
+  : > "${sample_id}.ffn" || true
   """
 }
-
 
 
 // ------------- Panaroo (pangenome) -------------
