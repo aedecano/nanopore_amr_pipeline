@@ -1,0 +1,20 @@
+# conda_setup/envs/bakta.yaml
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  # Bakta runtime tools dependencies
+  - prodigal
+  - barrnap
+  - hmmer
+  - blast
+  - mmseqs2
+  - infernal
+  - trnascan-se
+  - openssl
+  - curl
+  - pip:
+      - bakta==1.11.4

@@ -1,15 +1,14 @@
+// ================== Nextflow Pipeline for Nanopore AMR and Pangenome Analysis ==================
+
 nextflow.enable.dsl = 2
 
+// Load modules
 include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; MLST_CONTIGS_PS; MERGE_MLST; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
 
-// -------- Params --------
-params.kraken2_db = params.kraken2_db ?: null
-params.gtdbtk_db  = params.gtdbtk_db  ?: null
-params.reads  = params.reads ?: null
-params.outdir = params.outdir ?: 'results'
 
 // -------- Channels --------
 
+// Debugging info to check if files are visible to Nextflow
 def P = (params.reads ?: '').toString()
 log.info "CWD: ${java.nio.file.Paths.get('').toAbsolutePath()}"
 log.info "reads pattern: ${P}"
@@ -25,8 +24,13 @@ try {
 } catch(Exception e) {
   log.info "NIO check threw: ${e.class.name}: ${e.message}"
 }
+
+// Input reads channel (tuple: sample_id, fastq.gz)
+// Sample ID is derived from the file name by stripping common extensions
+// Supports: .fastq.gz, .fq.gz, .fastq, .fq
+// If no reads provided, the channel is empty
 if( params.reads ) {
-  Channel.fromPath(params.reads, checkIfExists: true) // (sample_id, fastq.gz)
+  Channel.fromPath(params.reads, checkIfExists: true) 
          .ifEmpty { error "No reads found for: ${params.reads}" }
          .map { f ->
          def sid = f.name
@@ -41,6 +45,10 @@ if( params.reads ) {
 // Optional: drop empty files early
 // reads = reads.filter { sid, fq -> fq.size() > 0 }
 
+// Input assemblies channel (tuple: sample_id, fasta)
+// Sample ID is derived from the file name by stripping common extensions
+// Supports: .fasta, .fa, .fna
+// If no assemblies provided, the channel is empty
 if( params.assemblies ) {
   Channel
     .fromPath(params.assemblies, checkIfExists: true)   // (sample_id, fasta)
@@ -93,13 +101,22 @@ workflow assembly_amr_pangenome {
     combined        = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
     abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined)
 
+      // MultiQC inputs: NanoPlot dirs and ABRicate TSVs (MultiQC parses both)
+    mqc_inputs = np_raw.report_dir.map { _, d -> d }
+                .mix( quast.report_dir.map { _, d -> d } )
+                .mix( np_filt.report_dir.map { _, d -> d } )
+                //.mix( kraken.report.map { _, f -> f } )
+                .mix( tag_amr.tagged )
+                .mix( tag_plm.tagged )
+                .collect()
+    mqc = MULTIQC(mqc_inputs)
+
     // MLST (per sample, merge then summarise)
-    mlst = MLST_CONTIGS_PS(flye.assembly, params.mlst_scheme)
-    mlst_merged  = mlst.mlst_tsv.collect()
-    mlst_summary = mlst.mlst_summary(mlst_merged) 
+    mlst       = MLST_CONTIGS_PS(flye.assembly) //, mlst_scheme: params.mlst_scheme)
+    merge_mlst = MERGE_MLST( mlst.mlst_tsv.map{ it[1] }.collect() )
 
     // Bakta (per sample)
-    //bakta    = BAKTA(flye.assembly)
+    bakta    = BAKTA(flye.assembly)
 
     // Panaroo (needs a list of GFFs)
     //gff_list = bakta.gff.map { sid, g -> g }.collect()
@@ -109,15 +126,6 @@ workflow assembly_amr_pangenome {
     //raxml    = RAXML_NG(pana.core_alignment)
     //iq       = IQTREE2(pana.core_alignment)
 
-    // MultiQC inputs: NanoPlot dirs and ABRicate TSVs (MultiQC parses both)
-    mqc_inputs = np_raw.report_dir.map { _, d -> d }
-                .mix( quast.report_dir.map { _, d -> d } )
-                .mix( np_filt.report_dir.map { _, d -> d } )
-                //.mix( kraken.report.map { _, f -> f } )
-                .mix( tag_amr.tagged )
-                .mix( tag_plm.tagged )
-                .collect()
-    mqc = MULTIQC(mqc_inputs)
     
   emit:
     nanoplot_raw_dirs    = np_raw.report_dir
@@ -143,10 +151,13 @@ workflow assembly_amr_pangenome {
     abricate_combined        = combined.combined
     abricate_summary_plots   = abri_summ_plots.plots
     per_sample_summary       = abri_summ_plots.per_sample_summary
-    mlst_tsv                 = mlst.mlst_tsv
-    mlst_merged              = mlst.mlst_merged
-    mlst_summary             = mlst.mlst_summary
-    //bakta_gff            = bakta.gff
+    mlst_tsv        = mlst.mlst_tsv
+    mlst_merged     = merge_mlst.mlst_merged
+    mlst_summary    = merge_mlst.mlst_summary  
+    bakta_gff                = bakta.gff
+    bakta_gbff               = bakta.gbff
+    bakta_faa                = bakta.proteins
+    bakta_ffn                = bakta.genes
     //core_alignment       = pana.core_alignment
     //raxml_tree           = raxml.besttree
     //iqtree_tree          = iq.treefile

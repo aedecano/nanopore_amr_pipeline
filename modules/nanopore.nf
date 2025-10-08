@@ -333,7 +333,7 @@ process MLST_CONTIGS_PS {
 
   input:
     tuple val(sample_id), path(contigs)
-    val mlst_scheme
+    //val mlst_scheme
 
   output:
     tuple val(sample_id), path("${sample_id}.mlst.tsv"), emit: mlst_tsv
@@ -392,7 +392,9 @@ process MERGE_MLST {
 process BAKTA {
   tag "$sample_id"
   label 'medium'
-  conda 'bioconda::bakta=1.9.4'
+
+  //conda 'bioconda::bakta=1.9.4'
+  conda 'conda_setup/envs/bakta.yaml'
   publishDir "${params.outdir}/bakta", mode: 'copy'
 
   input:
