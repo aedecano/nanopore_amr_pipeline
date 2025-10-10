@@ -1,0 +1,9 @@
+name: nf_24.10.3
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - nextflow=24.10.3
+  - openjdk=21
+  - curl
+  - coreutils

@@ -16,5 +16,7 @@ dependencies:
   - trnascan-se
   - openssl
   - curl
+  - ncbi-amrfinderplus
   - pip:
       - bakta==1.11.4
+      

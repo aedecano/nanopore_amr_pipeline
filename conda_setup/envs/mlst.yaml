@@ -1,0 +1,13 @@
+# conda_setup/envs/mlst.yaml
+name: mlst
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - mlst=2.23.0
+  - perl=5.32.*              # ensure conda perl, avoids Homebrew @INC
+  - perl-list-moreutils
+  - blast                    # mlst shells out to BLAST
+  - any2fasta                # used by mlst under the hood
+  - python>=3.8              # harmless, many systems expect python present

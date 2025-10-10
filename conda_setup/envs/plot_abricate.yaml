@@ -1,0 +1,27 @@
+name: analyse_abricate
+channels:
+  - conda-forge
+dependencies:
+  # Base R
+  - r-base=4.3.*
+  
+  # Core data wrangling and plotting
+  - r-tidyverse
+  - r-janitor
+  - r-optparse
+  
+  # Optional but recommended for safety and compatibility
+  - r-readr
+  - r-stringr
+  - r-forcats
+  - r-dplyr
+  - r-ggplot2
+  - r-tidyr
+  - r-purrr
+  
+  # Fonts and graphics support (helps with macOS)
+  - r-cairo
+  - r-scales
+
+  # Ensure consistent locale/UTF-8 handling
+  - r-locale
