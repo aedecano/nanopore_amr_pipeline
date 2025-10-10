@@ -3,7 +3,7 @@
 nextflow.enable.dsl = 2
 
 // Load modules
-include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; MLST_CONTIGS_PS; MERGE_MLST; BAKTA; PANAROO; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
+include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; MLST_CONTIGS_PS; MERGE_MLST; BAKTA; MERGE_GFF_FASTA; PANAROO; SELECT_PANAROO_GML; PLOT_PANAROO_GML; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
 
 
 // -------- Channels --------
@@ -26,9 +26,6 @@ try {
 }
 
 // Input reads channel (tuple: sample_id, fastq.gz)
-// Sample ID is derived from the file name by stripping common extensions
-// Supports: .fastq.gz, .fq.gz, .fastq, .fq
-// If no reads provided, the channel is empty
 if( params.reads ) {
   Channel.fromPath(params.reads, checkIfExists: true) 
          .ifEmpty { error "No reads found for: ${params.reads}" }
@@ -42,16 +39,11 @@ if( params.reads ) {
               } 
          .set { reads } 
 }
-// Optional: drop empty files early
-// reads = reads.filter { sid, fq -> fq.size() > 0 }
 
 // Input assemblies channel (tuple: sample_id, fasta)
-// Sample ID is derived from the file name by stripping common extensions
-// Supports: .fasta, .fa, .fna
-// If no assemblies provided, the channel is empty
 if( params.assemblies ) {
   Channel
-    .fromPath(params.assemblies, checkIfExists: true)   // (sample_id, fasta)
+    .fromPath(params.assemblies, checkIfExists: true)
     .ifEmpty { exit 1, "No assemblies found for: ${params.assemblies}" }
     .map { f ->
       def sid = f.getBaseName()
@@ -66,23 +58,16 @@ if( params.assemblies ) {
 // ---------------- Workflows ----------------
 
 // -------- Workflow: assembly_amr_pangenome --------
-// Takes nanopore reads (tuple: sample_id, reads), does QC, filtering, assembly,
-// assembly evaluation, AMR and plasmid gene detection with ABRicate, annotation with Bakta,
-// pangenome analysis with Panaroo, and generates a MultiQC report.
-
 workflow assembly_amr_pangenome {
 
   main:
     // QC -> Filter -> QC
     np_raw   = NANOPLOT_RAW(reads)
-    filt     = FILTLONG(reads)            // -> (sample_id, .filt.fastq.gz)
+    filt     = FILTLONG(reads)
     np_filt  = NANOPLOT_FILT(filt.reads)
 
-    //Taxonomy from filtered reads (contamination check)
-    //kraken = KRAKEN2(filt.reads)
-
     // Assemble
-    flye     = FLYE(filt.reads)           // -> (sample_id, .contigs.fasta)
+    flye     = FLYE(filt.reads)
 
     // Assembly evaluation
     quast = QUAST(flye.assembly)
@@ -99,49 +84,57 @@ workflow assembly_amr_pangenome {
     abri_all        = ab.amr_tsv.mix(ab.plm_tsv).collect()
     abri_merged     = merged_amr.merged.mix(merged_plm.merged).collect()
     combined        = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
-    abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined)
+    abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined.combined)
 
-      // MultiQC inputs: NanoPlot dirs and ABRicate TSVs (MultiQC parses both)
+    // MultiQC inputs
     mqc_inputs = np_raw.report_dir.map { _, d -> d }
                 .mix( quast.report_dir.map { _, d -> d } )
                 .mix( np_filt.report_dir.map { _, d -> d } )
-                //.mix( kraken.report.map { _, f -> f } )
                 .mix( tag_amr.tagged )
                 .mix( tag_plm.tagged )
                 .collect()
     mqc = MULTIQC(mqc_inputs)
 
     // MLST (per sample, merge then summarise)
-    mlst       = MLST_CONTIGS_PS(flye.assembly) //, mlst_scheme: params.mlst_scheme)
+    mlst       = MLST_CONTIGS_PS(flye.assembly)
     merge_mlst = MERGE_MLST( mlst.mlst_tsv.map{ it[1] }.collect() )
 
     // Bakta (per sample)
     bakta    = BAKTA(flye.assembly)
 
-    // Panaroo (needs a list of GFFs)
-    //gff_list = bakta.gff.map { sid, g -> g }.collect()
-    //pana     = PANAROO(gff_list)
+    // === CORRECTED PANAROO INTEGRATION ===
+    // Join Bakta GFF with assembly on sample_id
+    paired_annot = bakta.gff.join(flye.assembly)
+    
+    // Merge GFF + FASTA for each sample
+    merged_gffs = MERGE_GFF_FASTA(paired_annot)
+    
+    // Collect all merged GFFs and run Panaroo
+    gff_list = merged_gffs.merged.map { sid, gff -> gff }.collect()
+    pana = PANAROO(gff_list)
 
-    // Trees from core alignment
-    //raxml    = RAXML_NG(pana.core_alignment)
-    //iq       = IQTREE2(pana.core_alignment)
+    // Plot Panaroo results
+    pana_gml = SELECT_PANAROO_GML(pana.dir)
+    pana_plots = PLOT_PANAROO_GML(pana_gml)
+
+    // Optional: Trees from core alignment
+    // raxml = RAXML_NG(pana.fasta)
+    // iq = IQTREE2(pana.fasta)
 
     
   emit:
     nanoplot_raw_dirs    = np_raw.report_dir
     nanoplot_filt_dirs   = np_filt.report_dir
     filtered_reads       = filt.reads
-    //kraken_report        = kraken.report
-    //kraken_calls         = kraken.classified
     assemblies           = flye.assembly
     gfa_files            = flye.graph
     asm_info_files       = flye.info
     quast_dir            = quast.report_dir
     quast_tsv            = quast.report_tsv
     quast_txt            = quast.report_txt
-    bandage_png         = bandage.png
-    bandage_svg         = bandage.svg
-    bandage_nodes_table = bandage.info
+    bandage_png          = bandage.png
+    bandage_svg          = bandage.svg
+    bandage_nodes_table  = bandage.info
     abricate_amr_per_sample  = ab.amr_tsv
     abricate_amr_summary     = ab.amr_summary
     abricate_plm_per_sample  = ab.plm_tsv
@@ -151,33 +144,32 @@ workflow assembly_amr_pangenome {
     abricate_combined        = combined.combined
     abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
     per_sample_summary       = abri_summ_plots.per_sample_summary
-    mlst_tsv        = mlst.mlst_tsv
-    mlst_merged     = merge_mlst.mlst_merged
-    mlst_summary    = merge_mlst.mlst_summary  
-    bakta_gff      = bakta.gff
-    bakta_tsv       = bakta.tsv
-    bakta_faa       = bakta.faa
-    bakta_ffn       = bakta.ffn
-    bakta_txt       = bakta.txt
-    bakta_json      = bakta.json
-    bakta_embl      = bakta.embl
-    bakta_gbff      = bakta.gbff
-    bakta_inference_tsv = bakta.inference_tsv
-    bakta_svg       = bakta.svg
-    bakta_png       = bakta.png
-    bakta_log       = bakta.log
-    core_alignment  = pana.fasta
-    roary_like      = pana.csv
-    graph           = pana.gml
-    //raxml_tree           = raxml.besttree
-    //iqtree_tree          = iq.treefile
+    mlst_tsv             = mlst.mlst_tsv
+    mlst_merged          = merge_mlst.mlst_merged
+    mlst_summary         = merge_mlst.mlst_summary  
+    bakta_gff            = bakta.gff
+    bakta_tsv            = bakta.tsv
+    bakta_faa            = bakta.faa
+    bakta_ffn            = bakta.ffn
+    bakta_txt            = bakta.txt
+    bakta_json           = bakta.json
+    bakta_embl           = bakta.embl
+    bakta_gbff           = bakta.gbff
+    bakta_inference_tsv  = bakta.inference_tsv
+    bakta_svg            = bakta.svg
+    bakta_png            = bakta.png
+    bakta_log            = bakta.log
+    panaroo_dir          = pana.dir
+    core_alignment       = pana.fasta
+    roary_like           = pana.csv
+    graph_gml            = pana.gml
+    panaroo_plots        = pana_plots.all_plots
+    panaroo_plot_png     = pana_plots.plot
     multiqc_report       = mqc.report
 }
 
 
 // -------- Workflow: taxonomy_from_reads --------
-// Takes nanopore reads (tuple: sample_id, reads), runs Kraken2 on reads,
-// assembles with Flye, then runs GTDB-Tk on the assembly.
 workflow taxonomy_from_reads {
 
   main:
@@ -189,21 +181,79 @@ workflow taxonomy_from_reads {
     gtdb = GTDBTK_CLASSIFY(flye.assembly)
 
   emit:
-  kraken_report = kraken.report
-  kraken_calls  = kraken.classified
-  assembly      = flye.assembly
-  gtdb_summary  = gtdb.summary
-  gtdb_class    = gtdb.classification
+    kraken_report = kraken.report
+    kraken_calls  = kraken.classified
+    assembly      = flye.assembly
+    gtdb_summary  = gtdb.summary
+    gtdb_class    = gtdb.classification
 }
 
-// make this the default entry with:
-// workflow { taxonomy_from_reads() }
+
+// -------- Workflow: amr_annotation_from_assemblies --------
+// Takes assemblies, runs QUAST, ABRicate, MLST, and Bakta (no pangenome)
+workflow amr_annotation_from_assemblies {
+
+  main:
+    asm = assemblies
+
+    // Assembly evaluation
+    quast = QUAST(asm)
+
+    // Summarise Quast results with MultiQC
+    mqc_quast = MULTIQC(quast.report_dir.map { _, d -> d }.collect())
+    
+    // ABRicate (per sample), tag, merge
+    ab          = ABRICATE(asm)
+    tag_amr     = ABRICATE_TAG_AMR(ab.amr_tsv, 'amr')
+    tag_plm     = ABRICATE_TAG_PLM(ab.plm_tsv, 'plm')
+    merged_amr  = MERGE_ABRICATE_AMR(tag_amr.tagged.collect(), 'amr')
+    merged_plm  = MERGE_ABRICATE_PLM(tag_plm.tagged.collect(), 'plm')
+    abri_all    = ab.amr_tsv.mix(ab.plm_tsv).collect()
+    abri_merged = merged_amr.merged.mix(merged_plm.merged).collect()
+    combined    = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
+    abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined.combined)
+
+    // MLST (per sample, merge then summarise)
+    mlst       = MLST_CONTIGS_PS(asm)
+    merge_mlst = MERGE_MLST( mlst.mlst_tsv.map{ it[1] }.collect() )
+
+    // Bakta (per sample) - FINAL STEP
+    bakta = BAKTA(asm)
+
+  emit:
+    quast_dir                = quast.report_dir
+    quast_tsv                = quast.report_tsv
+    quast_txt                = quast.report_txt
+    multiqc_report           = mqc_quast.report
+    abricate_amr_per_sample  = ab.amr_tsv
+    abricate_amr_summary     = ab.amr_summary
+    abricate_plm_per_sample  = ab.plm_tsv
+    abricate_plm_summary     = ab.plm_summary
+    abricate_all_per_sample  = abri_all
+    abricate_merged_tsv      = abri_merged
+    abricate_combined        = combined.combined
+    abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
+    per_sample_summary       = abri_summ_plots.per_sample_summary
+    mlst_tsv                 = mlst.mlst_tsv
+    mlst_merged              = merge_mlst.mlst_merged
+    mlst_summary             = merge_mlst.mlst_summary  
+    bakta_gff                = bakta.gff
+    bakta_tsv                = bakta.tsv
+    bakta_faa                = bakta.faa
+    bakta_ffn                = bakta.ffn
+    bakta_txt                = bakta.txt
+    bakta_json               = bakta.json
+    bakta_embl               = bakta.embl
+    bakta_gbff               = bakta.gbff
+    bakta_inference_tsv      = bakta.inference_tsv
+    bakta_svg                = bakta.svg
+    bakta_png                = bakta.png
+    bakta_log                = bakta.log
+}
+
 
 // -------- Workflow: amr_pangenome_from_assemblies --------
-// Takes assemblies (tuple: sample_id, assembly), runs ABRicate for AMR genes, plasmid genes,
-// annotates with Bakta, does pangenome analysis with Panaroo, and builds trees
-// from the core alignment with RAxML-NG and IQ-TREE2.
-
+// Takes assemblies, runs QUAST, ABRicate, MLST, Bakta, and Panaroo pangenome
 workflow amr_pangenome_from_assemblies {
 
   main:
@@ -213,53 +263,171 @@ workflow amr_pangenome_from_assemblies {
     quast = QUAST(asm)
 
     // Summarise Quast results with MultiQC
-    mqc = MULTIQC(quast.report_dir.map { _, d -> d }.collect())
+    mqc_quast = MULTIQC(quast.report_dir.map { _, d -> d }.collect())
     
-
-  // ABRicate (per sample), tag, merge
+    // ABRicate (per sample), tag, merge
     ab          = ABRICATE(asm)
     tag_amr     = ABRICATE_TAG_AMR(ab.amr_tsv, 'amr')
     tag_plm     = ABRICATE_TAG_PLM(ab.plm_tsv, 'plm')
     merged_amr  = MERGE_ABRICATE_AMR(tag_amr.tagged.collect(), 'amr')
     merged_plm  = MERGE_ABRICATE_PLM(tag_plm.tagged.collect(), 'plm')
-    combined    = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
     abri_all    = ab.amr_tsv.mix(ab.plm_tsv).collect()
     abri_merged = merged_amr.merged.mix(merged_plm.merged).collect()
+    combined    = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
+    abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined.combined)
 
-  // Bakta (per sample)
-  //bakta    = BAKTA_ANNOTATE(asm)
+    // MLST (per sample, merge then summarise)
+    mlst       = MLST_CONTIGS_PS(asm)
+    merge_mlst = MERGE_MLST( mlst.mlst_tsv.map{ it[1] }.collect() )
 
-  // ----- Collect GFFs for cohort-level steps -----
-  //gff_list = bakta.gff
-              //.map { sid, gff -> gff }
-              //.collect()
-              .map { gffs -> tuple(asm_ch.map{sid,_->sid}.toList().unique(), gffs) }
+    // Bakta (per sample)
+    bakta = BAKTA(asm)
 
-  // Panaroo + Piggy on the whole cohort
-  panaroo = PANAROO_RUN(gff_list)
- //piggy   = PIGGY_RUN(gff_list)
+    // === CORRECTED PANAROO INTEGRATION ===
+    // Join Bakta GFF with assembly on sample_id
+    paired_annot = bakta.gff.join(asm)
+    
+    // Merge GFF + FASTA for each sample
+    merged_gffs = MERGE_GFF_FASTA(paired_annot)
+    
+    // Collect all merged GFFs and run Panaroo
+    gff_list = merged_gffs.merged.map { sid, gff -> gff }.collect()
+    pana = PANAROO(gff_list)
 
-  // ----- Trees from Panaroo core alignment -----
-  // Run both trees only if a core alignment was produced
-  //raxml  = RAXML_NG_TREE(panaroo.core_aln)
-  //iqtree = IQTREE2_TREE(panaroo.core_aln)
+    // Plot Panaroo results
+    pana_gml = SELECT_PANAROO_GML(pana.dir)
+    pana_plots = PLOT_PANAROO_GML(pana_gml)
 
-  // ----- Emits -----
+    // Optional: Trees from core alignment
+    // raxml = RAXML_NG(pana.fasta)
+    // iq = IQTREE2(pana.fasta)
+
   emit:
-    quast_dir            = quast.report_dir
-    quast_tsv            = quast.report_tsv
-    quast_txt            = quast.report_txt
-    multiqc_report       = mqc.report
+    quast_dir                = quast.report_dir
+    quast_tsv                = quast.report_tsv
+    quast_txt                = quast.report_txt
+    multiqc_report           = mqc_quast.report
     abricate_amr_per_sample  = ab.amr_tsv
     abricate_amr_summary     = ab.amr_summary
     abricate_plm_per_sample  = ab.plm_tsv
     abricate_plm_summary     = ab.plm_summary
     abricate_all_per_sample  = abri_all
-    abricate_merged_tsv  = abri_merged
-    abricate_combined    = combined.combined
-    //gff_files    = bakta.gff
-    //panaroo_dir  = panaroo.outdir
-    //piggy_dir    = piggy.outdir
-    //raxml_files  = raxml.files
-    //iqtree_files = iqtree.files
+    abricate_merged_tsv      = abri_merged
+    abricate_combined        = combined.combined
+    abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
+    per_sample_summary       = abri_summ_plots.per_sample_summary
+    mlst_tsv                 = mlst.mlst_tsv
+    mlst_merged              = merge_mlst.mlst_merged
+    mlst_summary             = merge_mlst.mlst_summary  
+    bakta_gff                = bakta.gff
+    bakta_tsv                = bakta.tsv
+    bakta_faa                = bakta.faa
+    bakta_ffn                = bakta.ffn
+    bakta_txt                = bakta.txt
+    bakta_json               = bakta.json
+    bakta_embl               = bakta.embl
+    bakta_gbff               = bakta.gbff
+    bakta_inference_tsv      = bakta.inference_tsv
+    bakta_svg                = bakta.svg
+    bakta_png                = bakta.png
+    bakta_log                = bakta.log
+    panaroo_dir              = pana.dir
+    core_alignment           = pana.fasta
+    roary_like               = pana.csv
+    graph_gml                = pana.gml
+    panaroo_plots            = pana_plots.all_plots
+    panaroo_plot_png         = pana_plots.plot
+}
+
+// -------- Workflow: assembly_amr_annotation --------
+// Takes nanopore reads, does QC, filtering, assembly, evaluation,
+// AMR/plasmid detection, MLST, and Bakta annotation (no pangenome analysis)
+workflow assembly_amr_annotation {
+
+  main:
+    // QC -> Filter -> QC
+    np_raw   = NANOPLOT_RAW(reads)
+    filt     = FILTLONG(reads)
+    np_filt  = NANOPLOT_FILT(filt.reads)
+
+    // Assemble
+    flye     = FLYE(filt.reads)
+
+    // Assembly evaluation
+    quast = QUAST(flye.assembly)
+
+    // Bandage exports (runs only for samples where a GFA exists)
+    bandage = BANDAGE_IMAGE(flye.graph)
+
+    // ABRicate (per sample), tag, merge
+    ab              = ABRICATE(flye.assembly)
+    tag_amr         = ABRICATE_TAG_AMR(ab.amr_tsv, 'amr')
+    tag_plm         = ABRICATE_TAG_PLM(ab.plm_tsv, 'plm')
+    merged_amr      = MERGE_ABRICATE_AMR(tag_amr.tagged.collect(), 'amr')
+    merged_plm      = MERGE_ABRICATE_PLM(tag_plm.tagged.collect(), 'plm')
+    abri_all        = ab.amr_tsv.mix(ab.plm_tsv).collect()
+    abri_merged     = merged_amr.merged.mix(merged_plm.merged).collect()
+    combined        = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
+    abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined.combined)
+
+    // MultiQC inputs
+    mqc_inputs = np_raw.report_dir.map { _, d -> d }
+                .mix( quast.report_dir.map { _, d -> d } )
+                .mix( np_filt.report_dir.map { _, d -> d } )
+                .mix( tag_amr.tagged )
+                .mix( tag_plm.tagged )
+                .collect()
+    mqc = MULTIQC(mqc_inputs)
+
+    // MLST (per sample, merge then summarise)
+    mlst       = MLST_CONTIGS_PS(flye.assembly)
+    merge_mlst = MERGE_MLST( mlst.mlst_tsv.map{ it[1] }.collect() )
+
+    // Bakta (per sample) - FINAL STEP
+    bakta    = BAKTA(flye.assembly)
+
+  emit:
+    nanoplot_raw_dirs        = np_raw.report_dir
+    nanoplot_filt_dirs       = np_filt.report_dir
+    filtered_reads           = filt.reads
+    assemblies               = flye.assembly
+    gfa_files                = flye.graph
+    asm_info_files           = flye.info
+    quast_dir                = quast.report_dir
+    quast_tsv                = quast.report_tsv
+    quast_txt                = quast.report_txt
+    bandage_png              = bandage.png
+    bandage_svg              = bandage.svg
+    bandage_nodes_table      = bandage.info
+    abricate_amr_per_sample  = ab.amr_tsv
+    abricate_amr_summary     = ab.amr_summary
+    abricate_plm_per_sample  = ab.plm_tsv
+    abricate_plm_summary     = ab.plm_summary
+    abricate_all_per_sample  = abri_all
+    abricate_merged_tsv      = abri_merged
+    abricate_combined        = combined.combined
+    abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
+    per_sample_summary       = abri_summ_plots.per_sample_summary
+    mlst_tsv                 = mlst.mlst_tsv
+    mlst_merged              = merge_mlst.mlst_merged
+    mlst_summary             = merge_mlst.mlst_summary  
+    bakta_gff                = bakta.gff
+    bakta_tsv                = bakta.tsv
+    bakta_faa                = bakta.faa
+    bakta_ffn                = bakta.ffn
+    bakta_txt                = bakta.txt
+    bakta_json               = bakta.json
+    bakta_embl               = bakta.embl
+    bakta_gbff               = bakta.gbff
+    bakta_inference_tsv      = bakta.inference_tsv
+    bakta_svg                = bakta.svg
+    bakta_png                = bakta.png
+    bakta_log                = bakta.log
+    multiqc_report           = mqc.report
+}
+
+
+// Default workflow entry point
+workflow {
+  assembly_amr_pangenome()
 }

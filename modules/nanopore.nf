@@ -419,10 +419,11 @@ process BAKTA {
   script:
   def skipFlags = []
   if (params.bakta_skip_crispr) skipFlags << '--skip-crispr'
-  if (params.bakta_skip_tmrna)  skipFlags << '--skip-tmrna'
-  if (params.bakta_skip_cds)    skipFlags << '--skip-cds'
-  if (params.bakta_skip_sorf)   skipFlags << '--skip-sorf'
+  //if (params.bakta_skip_tmrna)  skipFlags << '--skip-tmrna'
+  //if (params.bakta_skip_cds)    skipFlags << '--skip-cds'
+  //if (params.bakta_skip_sorf)   skipFlags << '--skip-sorf'
 
+  script:
   """
   set -euo pipefail
 
@@ -473,6 +474,137 @@ process PANAROO {
   panaroo -i ${gff_list.join(' ')} -o panaroo_output -t ${task.cpus} --clean-mode strict --remove-invalid-genes
   """
 }
+
+// ---------- MERGE GFF + FASTA into Prokka-style GFF ----------
+process MERGE_GFF_FASTA {
+  tag "$sample_id"
+  label 'light'
+
+  input:
+    tuple val(sample_id), path(gff3), path(fasta)
+
+  output:
+    tuple val(sample_id), path("${sample_id}.merged.gff"), emit: merged
+
+  script:
+  """
+  set -euo pipefail
+  # Strip any existing ##FASTA section from Bakta GFF
+  awk 'BEGIN{inF=0} /^##FASTA/{inF=1; next} !inF{print}' "${gff3}" > "${sample_id}.merged.gff"
+  echo '##FASTA' >> "${sample_id}.merged.gff"
+  case "${fasta}" in
+    *.gz)  gunzip -c "${fasta}" >> "${sample_id}.merged.gff" ;;
+    *)     cat "${fasta}" >> "${sample_id}.merged.gff" ;;
+  esac
+  """
+}
+
+// ---------- Panaroo (pangenome analysis) ----------
+process PANAROO {
+  tag "panaroo"
+  label 'heavy'
+  conda 'conda_setup/envs/panaroo.yaml'
+  publishDir "${params.outdir}/panaroo", mode: 'copy'
+
+  input:
+    path gff_files  // List of merged GFF files
+
+  output:
+    path "results",                                    emit: dir
+    path "results/core_gene_alignment.aln.fasta",      emit: fasta, optional: true
+    path "results/gene_presence_absence.csv",          emit: csv, optional: true
+    path "results/final_graph.gml",                    emit: gml, optional: true
+    path "results/pre_filt_graph.gml",                 emit: gml_alt, optional: true
+
+  script:
+  """
+  set -euo pipefail
+  mkdir -p results
+  panaroo -i ${gff_files.join(' ')} -o ${params.outdir} \\
+    --clean-mode ${params.panaroo_clean_mode} \\
+    --remove-invalid-genes \\
+    --alignment core \\
+    --aligner mafft \\
+    -t ${task.cpus}
+  """
+}
+
+// ---------- Select Panaroo GML (handles different output names) ----------
+process SELECT_PANAROO_GML {
+  tag "select_gml"
+  label 'light'
+  publishDir "${params.outdir}/panaroo", mode: 'copy'
+
+  input:
+    path panaroo_dir
+
+  output:
+    path "final_graph.gml", emit: gml
+
+  script:
+  """
+  set -euo pipefail
+  cd "${panaroo_dir}"
+  
+  # Try to find GML file in order of preference
+  if [ -f final_graph.gml ]; then 
+    cp final_graph.gml "${OLDPWD}/final_graph.gml"
+  elif [ -f pre_filt_graph.gml ]; then 
+    cp pre_filt_graph.gml "${OLDPWD}/final_graph.gml"
+  else
+    # Find any GML file as fallback
+    gml_file=\$(find . -name "*.gml" -type f | head -n1)
+    if [ -n "\$gml_file" ]; then
+      cp "\$gml_file" "${OLDPWD}/final_graph.gml"
+    else
+      echo "ERROR: No GML file found in Panaroo output" >&2
+      exit 1
+    fi
+  fi
+  """
+}
+
+// ---------- Plot Panaroo GML ----------
+process PLOT_PANAROO_GML {
+  tag "plot_gml"
+  label 'light'
+  conda "conda_setup/envs/panaroo_plot.yaml"
+  publishDir "${params.outdir}/panaroo/plots", mode: 'copy'
+
+  input:
+    path gml_file
+
+  output:
+    path "gml_view/*",                      emit: all_plots
+    path "LCC_plot.png",                    emit: plot
+    path "LCC_nodes.tsv",                   emit: nodes
+    path "LCC_edges.tsv",                   emit: edges
+    path "LCC.graphml", optional: true,     emit: graphml
+    path "LCC.gexf",    optional: true,     emit: gexf
+
+  script:
+  """
+  set -euo pipefail
+  
+  # Run visualization script
+  python ${projectDir}/scripts/panaroo_gml_view.py "${gml_file}" \\
+    --outdir gml_view \\
+    --max-nodes ${params.panaroo_plot_max_nodes ?: 800} \\
+    --legend-top-n ${params.panaroo_plot_top_n ?: 10} \\
+    --layout ${params.panaroo_plot_layout ?: 'spring'} \\
+    --hub-quantile ${params.panaroo_plot_hub_quantile ?: 0.95} \\
+    ${params.panaroo_plot_outline ? '--outline' : ''}
+  
+  # Copy key artifacts to process working directory for easier access
+  cp gml_view/LCC_plot.png .
+  cp gml_view/LCC_nodes.tsv .
+  cp gml_view/LCC_edges.tsv .
+  [ -f gml_view/LCC.graphml ] && cp gml_view/LCC.graphml . || true
+  [ -f gml_view/LCC.gexf ] && cp gml_view/LCC.gexf . || true
+  """
+}
+
+
 
 // ------------- RAxML-NG (tree) -------------
 process RAXML_NG {
