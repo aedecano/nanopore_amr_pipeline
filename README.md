@@ -459,7 +459,7 @@ Contributions are welcome! Please:
 
 For questions, issues, or suggestions:
 - Open an issue on GitHub
-- Email: your.email@institution.edu
+- Email: adecano@sgul.ac.uk
 
 ## Changelog
 
