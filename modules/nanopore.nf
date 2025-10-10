@@ -452,29 +452,6 @@ process BAKTA {
   """
 }
 
-
-// ------------- Panaroo (pangenome) -------------
-process PANAROO {
-  tag "panaroo"
-  label 'heavy'
-  publishDir "${params.outdir}/panaroo", mode: 'copy'
-
-  input:
-    path(gff_list)
-
-  output:
-    path("panaroo_output/core_gene_alignment.aln.fasta"), emit: core_alignment
-    path("panaroo_output/roary_output.csv"),               emit: roary_like
-    path("panaroo_output/graph.gml"),                      emit: graph
-
-  script:
-  """
-  set -eo pipefail
-  mkdir -p panaroo_output
-  panaroo -i ${gff_list.join(' ')} -o panaroo_output -t ${task.cpus} --clean-mode strict --remove-invalid-genes
-  """
-}
-
 // ---------- MERGE GFF + FASTA into Prokka-style GFF ----------
 process MERGE_GFF_FASTA {
   tag "$sample_id"
