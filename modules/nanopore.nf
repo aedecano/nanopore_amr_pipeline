@@ -457,6 +457,8 @@ process MERGE_GFF_FASTA {
   tag "$sample_id"
   label 'light'
 
+  publishDir "${params.outdir}/merged_gffs/", mode: 'copy', overwrite: true
+
   input:
     tuple val(sample_id), path(gff3), path(fasta)
 
