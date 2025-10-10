@@ -1,0 +1,84 @@
+Oct-10 10:16:30.316 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf -entry assembly_amr_annotation --help
+Oct-10 10:16:30.454 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.7
+Oct-10 10:16:30.468 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/arundecano/.nextflow/plugins; core-plugins: nf-amazon@2.15.0-patch1,nf-azure@1.16.0-patch1,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.1,nf-k8s@1.0.0,nf-tower@1.11.4-patch1,nf-wave@1.12.1
+Oct-10 10:16:30.477 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Oct-10 10:16:30.477 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Oct-10 10:16:30.479 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Oct-10 10:16:30.484 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Oct-10 10:16:30.492 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/nextflow.config
+Oct-10 10:16:30.493 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/nextflow.config
+Oct-10 10:16:30.507 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /Users/arundecano/.nextflow/secrets/store.json
+Oct-10 10:16:30.508 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@56781d96] - activable => nextflow.secret.LocalSecretsProvider@56781d96
+Oct-10 10:16:30.513 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-10 10:16:30.778 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Oct-10 10:16:30.786 [main] DEBUG nextflow.cli.CmdRun - Launching `main.nf` [distraught_poitras] DSL2 - revision: d1d497b459
+Oct-10 10:16:30.787 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Oct-10 10:16:30.787 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Oct-10 10:16:30.809 [main] DEBUG nextflow.Session - Session UUID: 9e7a9ac9-785e-4e96-98a9-ae3159070304
+Oct-10 10:16:30.809 [main] DEBUG nextflow.Session - Run name: distraught_poitras
+Oct-10 10:16:30.809 [main] DEBUG nextflow.Session - Executor pool size: 10
+Oct-10 10:16:30.813 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Oct-10 10:16:30.814 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=30; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-10 10:16:35.831 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.04.7 build 5955
+  Created: 08-09-2025 13:29 UTC (14:29 BST)
+  System: Mac OS X 15.6.1
+  Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 17.0.15+6-LTS
+  Encoding: UTF-8 (UTF-8)
+  Process: 78772@Aruns-MacBook-Air.local [192.168.0.77]
+  CPUs: 10 - Mem: 24 GB (155.3 MB) - Swap: 1 GB (632.6 MB)
+Oct-10 10:16:35.845 [main] DEBUG nextflow.Session - Work-dir: /Users/arundecano/nxf_work [Mac OS X]
+Oct-10 10:16:35.864 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Oct-10 10:16:35.868 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Oct-10 10:16:35.878 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Oct-10 10:16:35.887 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Oct-10 10:16:35.891 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 11; maxThreads: 1000
+Oct-10 10:16:35.913 [main] DEBUG nextflow.Session - Session start
+Oct-10 10:16:35.914 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/results/pipeline_trace.txt
+Oct-10 10:16:36.186 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Oct-10 10:16:36.491 [main] INFO  nextflow.Nextflow - CWD: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline
+Oct-10 10:16:36.491 [main] INFO  nextflow.Nextflow - reads pattern: 
+Oct-10 10:16:36.491 [main] INFO  nextflow.Nextflow - JavaFile.exists=false isFile=false path=
+Oct-10 10:16:36.491 [main] INFO  nextflow.Nextflow - NIO Files.exists=true isRegularFile=false
+Oct-10 10:16:36.515 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_717acf4963960050: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/modules/nanopore.nf
+  Script_7e27a166fa6efcf7: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/main.nf
+Oct-10 10:16:36.516 [main] DEBUG nextflow.Session - Session aborted -- Cause: No such property: reads for class: nextflow.script.WorkflowBinding
+Possible solutions: class
+Oct-10 10:16:36.521 [main] ERROR nextflow.cli.Launcher - @unknown
+groovy.lang.MissingPropertyException: No such property: reads for class: nextflow.script.WorkflowBinding
+Possible solutions: class
+	at groovy.lang.Binding.getVariable(Binding.java:56)
+	at nextflow.script.WorkflowBinding.getVariable(WorkflowBinding.groovy:143)
+	at groovy.lang.Binding.getProperty(Binding.java:117)
+	at nextflow.script.WorkflowBinding.getProperty(WorkflowBinding.groovy:132)
+	at org.codehaus.groovy.runtime.InvokerHelper.getProperty(InvokerHelper.java:167)
+	at groovy.lang.Closure.getPropertyTryThese(Closure.java:325)
+	at groovy.lang.Closure.getPropertyDelegateFirst(Closure.java:315)
+	at groovy.lang.Closure.getProperty(Closure.java:301)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:321)
+	at Script_7e27a166fa6efcf7$_runScript_closure11$_closure27.doCall(Script_7e27a166fa6efcf7:349)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.codehaus.groovy.reflection.CachedMethod.invoke(CachedMethod.java:343)
+	at groovy.lang.MetaMethod.doMethodInvoke(MetaMethod.java:328)
+	at org.codehaus.groovy.runtime.metaclass.ClosureMetaClass.invokeMethod(ClosureMetaClass.java:280)
+	at groovy.lang.MetaClassImpl.invokeMethod(MetaClassImpl.java:1007)
+	at groovy.lang.Closure.call(Closure.java:433)
+	at groovy.lang.Closure.call(Closure.java:412)
+	at nextflow.script.WorkflowDef.run0(WorkflowDef.groovy:205)
+	at nextflow.script.WorkflowDef.run(WorkflowDef.groovy:189)
+	at nextflow.script.BindableDef.invoke_a(BindableDef.groovy:51)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:321)
+	at nextflow.script.BaseScript.run0(BaseScript.groovy:182)
+	at org.codehaus.groovy.vmplugin.v8.IndyInterface.fromCache(IndyInterface.java:321)
+	at nextflow.script.BaseScript.run(BaseScript.groovy:193)
+	at nextflow.script.parser.v1.ScriptLoaderV1.runScript(ScriptLoaderV1.groovy:246)
+	at nextflow.script.parser.v1.ScriptLoaderV1.runScript(ScriptLoaderV1.groovy)
+	at nextflow.script.ScriptRunner.run(ScriptRunner.groovy:246)
+	at nextflow.script.ScriptRunner.execute(ScriptRunner.groovy:139)
+	at nextflow.cli.CmdRun.run(CmdRun.groovy:379)
+	at nextflow.cli.Launcher.run(Launcher.groovy:513)
+	at nextflow.cli.Launcher.main(Launcher.groovy:673)

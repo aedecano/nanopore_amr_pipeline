@@ -1,7 +1,0 @@
-name: raxml
-channels:
-- conda-forge
-- bioconda
-- defaults
-dependencies:
-- raxml

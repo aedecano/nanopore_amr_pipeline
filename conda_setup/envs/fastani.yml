@@ -1,7 +1,0 @@
-name: fastani
-channels:
-- conda-forge
-- bioconda
-- defaults
-dependencies:
-- fastani

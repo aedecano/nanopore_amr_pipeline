@@ -1,7 +1,0 @@
-name: amr_plm
-channels:
-- conda-forge
-- bioconda
-- defaults
-dependencies:
-- plasmidfinder

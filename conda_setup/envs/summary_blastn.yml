@@ -1,7 +1,0 @@
-name: summary_blastn
-channels:
-- conda-forge
-- bioconda
-- defaults
-dependencies:
-- blast

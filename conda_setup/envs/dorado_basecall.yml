@@ -1,7 +1,0 @@
-name: dorado_basecall
-channels:
-- conda-forge
-- bioconda
-- defaults
-dependencies:
-- dorado
