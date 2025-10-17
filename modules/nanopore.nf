@@ -290,7 +290,7 @@ process PLOT_SUMMARIZE_ABRICATE {
 
   script:
   """
-  analyse_abricate.R \
+  ${projectDir}/scripts/analyse_abricate.R \
     -i ${abricate_merged} \
     -o abricate_plots \
     -n ${params.abricate_summary_topN ?: 30} \
@@ -453,7 +453,55 @@ process BAKTA {
 }
 
 // ---------- MERGE GFF + FASTA into Prokka-style GFF ----------
+
 process MERGE_GFF_FASTA {
+  tag "$sample_id"
+  label 'light'
+  publishDir "${params.outdir}/merged_gff", mode: 'copy'
+  //conda 'conda_setup/envs/coreutils.yaml'  // or any tiny env with awk/sed; can omit if system has them
+
+  input:
+    tuple val(sample_id), path(gff), path(fasta)
+
+  output:
+    tuple val(sample_id), path("${sample_id}.merged.gff"), emit: merged
+
+  script:
+  """
+  set -euo pipefail
+
+  bash scripts/merge_gff_fasta.sh 
+  bash make_merged_list.sh
+  """
+
+}
+
+process MERGE_GFF_FASTA_1 {
+  tag "$sample_id"
+  label 'light'
+  publishDir "${params.outdir}/merged_gff", mode: 'copy'
+  //conda 'conda_setup/envs/coreutils.yaml'  // or any tiny env with awk/sed; can omit if system has them
+
+  input:
+    tuple val(sample_id), path(gff), path(fasta)
+
+  output:
+    tuple val(sample_id), path("${sample_id}.merged.gff"), emit: merged_gff_list
+
+  script:
+  """
+  set -euo pipefail
+
+  # Ensure GFF ends with a single newline before appending ##FASTA
+  awk '1;END{if(NR>0 && substr(\$0,length(\$0),1)!="\\n") print ""}' "${gff}" > "${sample_id}.merged.gff"
+
+  # Append FASTA as per GFF3 spec so Panaroo can see sequences if needed
+  echo "##FASTA" >> "${sample_id}.merged.gff"
+  cat "${assembly_fasta}" >> "${sample_id}.merged.gff"
+  """
+}
+
+process MERGE_GFF_FASTA_0 {
   tag "$sample_id"
   label 'light'
 
@@ -479,17 +527,18 @@ process MERGE_GFF_FASTA {
 }
 
 // ---------- Panaroo (pangenome analysis) ----------
-process PANAROO {
+
+process PANAROO_0 {
   tag "panaroo"
-  label 'heavy'
-  conda 'conda_setup/envs/panaroo.yaml'
+  label 'medium'
+  //conda 'conda_setup/envs/panaroo.yaml'
   publishDir "${params.outdir}/panaroo", mode: 'copy'
 
   input:
     path gff_files  // List of merged GFF files
 
   output:
-    path "results",                                    emit: dir
+    path "panaroo_files",                              emit: dir
     path "results/core_gene_alignment.aln.fasta",      emit: fasta, optional: true
     path "results/gene_presence_absence.csv",          emit: csv, optional: true
     path "results/final_graph.gml",                    emit: gml, optional: true
@@ -498,15 +547,51 @@ process PANAROO {
   script:
   """
   set -euo pipefail
-  mkdir -p results
-  panaroo -i ${gff_files.join(' ')} -o ${params.outdir} \\
-    --clean-mode ${params.panaroo_clean_mode} \\
-    --remove-invalid-genes \\
-    --alignment core \\
-    --aligner mafft \\
+  panaroo -i ${gff_files.join(' ')} -o ${params.outdir} \
+    --clean-mode ${params.panaroo_clean_mode} \
+    --remove-invalid-genes \
+    --alignment core \
+    --aligner mafft \
     -t ${task.cpus}
   """
 }
+
+process PANAROO {
+  tag "panaroo"
+  label 'medium'
+  conda 'conda_setup/envs/panaroo.yaml'
+  publishDir "${params.outdir}/panaroo", mode: 'copy'
+
+  input:
+    path merged_gff_list
+
+  output:
+    path "results/core_gene_alignment.aln.fasta",      emit: core_aln, optional: true
+    path "results/gene_presence_absence.csv",          emit: roary_like,   optional: true
+    path "results/final_graph.gml",                    emit: graph_gml,     optional: true
+    path "results/pre_filt_graph.gml",                 emit: graph_gml_alt, optional: true
+    path "results",                                    emit: panaroo_dir,       optional: true
+
+  script:
+  """
+  set -euo pipefail
+
+  if [ ! -s "${merged_gff_list}" ]; then
+    echo "[ERROR] No merged GFFs found in input: ${merged_gff_list}" >&2
+    exit 1
+  fi
+
+  mkdir -p results
+  panaroo -i \$(cat "${merged_gff_list}") \
+    -o results \
+    --clean-mode ${params.panaroo_clean_mode} \
+    --remove-invalid-genes \
+    --alignment core \
+    --aligner mafft \
+    -t ${task.cpus}
+  """
+}
+
 
 // ---------- Select Panaroo GML (handles different output names) ----------
 process SELECT_PANAROO_GML {
@@ -527,14 +612,14 @@ process SELECT_PANAROO_GML {
   
   # Try to find GML file in order of preference
   if [ -f final_graph.gml ]; then 
-    cp final_graph.gml "${OLDPWD}/final_graph.gml"
+    cp final_graph.gml "${params.outdir}/final_graph.gml"
   elif [ -f pre_filt_graph.gml ]; then 
-    cp pre_filt_graph.gml "${OLDPWD}/final_graph.gml"
+    cp pre_filt_graph.gml "${params.outdir}/final_graph.gml"
   else
     # Find any GML file as fallback
     gml_file=\$(find . -name "*.gml" -type f | head -n1)
     if [ -n "\$gml_file" ]; then
-      cp "\$gml_file" "${OLDPWD}/final_graph.gml"
+      cp "\$gml_file" "${params.outdir}/final_graph.gml"
     else
       echo "ERROR: No GML file found in Panaroo output" >&2
       exit 1
