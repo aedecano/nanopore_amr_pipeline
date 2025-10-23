@@ -479,74 +479,35 @@ process BAKTA {
 // ---------- MERGE GFF + FASTA into Prokka-style GFF ----------
 
 process MERGE_GFF_FASTA {
-  tag "$sample_id"
-  label 'light'
-  publishDir "${params.outdir}/merged_gff", mode: 'copy'
-  //conda 'conda_setup/envs/coreutils.yaml'  // or any tiny env with awk/sed; can omit if system has them
-
+  tag "${sample_id}"
+  label 'small'
+  publishDir "${params.outdir}/merged_gff_fasta", mode: 'copy'
+  
   input:
     tuple val(sample_id), path(gff), path(fasta)
-
+  
   output:
-    tuple val(sample_id), path("${sample_id}.merged.gff"), emit: merged
-
+    tuple val(sample_id), path("${sample_id}.merged.gff"), emit: merged_gff
+  
   script:
   """
+  #!/bin/bash
   set -euo pipefail
-
-  bash scripts/merge_gff_fasta.sh 
-  bash make_merged_list.sh
-  """
-
-}
-
-process MERGE_GFF_FASTA_1 {
-  tag "$sample_id"
-  label 'light'
-  publishDir "${params.outdir}/merged_gff", mode: 'copy'
-  //conda 'conda_setup/envs/coreutils.yaml'  // or any tiny env with awk/sed; can omit if system has them
-
-  input:
-    tuple val(sample_id), path(gff), path(fasta)
-
-  output:
-    tuple val(sample_id), path("${sample_id}.merged.gff"), emit: merged_gff_list
-
-  script:
-  """
-  set -euo pipefail
-
-  # Ensure GFF ends with a single newline before appending ##FASTA
-  awk '1;END{if(NR>0 && substr(\$0,length(\$0),1)!="\\n") print ""}' "${gff}" > "${sample_id}.merged.gff"
-
-  # Append FASTA as per GFF3 spec so Panaroo can see sequences if needed
-  echo "##FASTA" >> "${sample_id}.merged.gff"
-  cat "${assembly_fasta}" >> "${sample_id}.merged.gff"
-  """
-}
-
-process MERGE_GFF_FASTA_0 {
-  tag "$sample_id"
-  label 'light'
-
-  publishDir "${params.outdir}/merged_gffs/", mode: 'copy', overwrite: true
-
-  input:
-    tuple val(sample_id), path(gff3), path(fasta)
-
-  output:
-    tuple val(sample_id), path("${sample_id}.merged.gff"), emit: merged
-
-  script:
-  """
-  set -euo pipefail
-  # Strip any existing ##FASTA section from Bakta GFF
-  awk 'BEGIN{inF=0} /^##FASTA/{inF=1; next} !inF{print}' "${gff3}" > "${sample_id}.merged.gff"
-  echo '##FASTA' >> "${sample_id}.merged.gff"
-  case "${fasta}" in
-    *.gz)  gunzip -c "${fasta}" >> "${sample_id}.merged.gff" ;;
-    *)     cat "${fasta}" >> "${sample_id}.merged.gff" ;;
-  esac
+  
+  # Copy the GFF file as base
+  cp ${gff} ${sample_id}.merged.gff
+  
+  # Append FASTA marker if not already present
+  if ! grep -q "##FASTA" ${sample_id}.merged.gff; then
+    echo "##FASTA" >> ${sample_id}.merged.gff
+  fi
+  
+  # Decompress and append FASTA content
+  if [[ ${fasta} == *.gz ]]; then
+    gunzip -c ${fasta} >> ${sample_id}.merged.gff
+  else
+    cat ${fasta} >> ${sample_id}.merged.gff
+  fi
   """
 }
 
