@@ -24,6 +24,7 @@ process NANOPLOT_RAW {
   """
 }
 
+
 // ------------- Filtlong -------------
 process FILTLONG {
   tag "$sample_id"
@@ -240,9 +241,32 @@ process MERGE_ABRICATE {
 
   script:
   """
-  set -eo pipefail
-  first=\$(ls -1 ${tagged_tsvs} | head -n1)
-  { head -n1 "\$first"; for f in ${tagged_tsvs}; do awk 'NR>1' "\$f"; done; } > abricate_merged_${db_type}.tsv
+  set -euo pipefail
+
+  out="abricate_merged_${db_type}.tsv"
+
+  # Find the first non-empty TSV to copy the header from
+  first=""
+  for f in ${tagged_tsvs}; do
+    if [[ -s "\$f" ]]; then
+      first="\$f"
+      break
+    fi
+  done
+
+  if [[ -z "\$first" ]]; then
+    echo "No non-empty input files for db_type='${db_type}'" >&2
+    exit 1
+  fi
+
+  # Write header once
+  head -n 1 "\$first" > "\$out"
+
+  # Append all bodies (skip headers)
+  for f in ${tagged_tsvs}; do
+    [[ -s "\$f" ]] || continue
+    tail -n +2 "\$f" >> "\$out"
+  done
   """
 }
 
@@ -528,34 +552,6 @@ process MERGE_GFF_FASTA_0 {
 
 // ---------- Panaroo (pangenome analysis) ----------
 
-process PANAROO_0 {
-  tag "panaroo"
-  label 'medium'
-  //conda 'conda_setup/envs/panaroo.yaml'
-  publishDir "${params.outdir}/panaroo", mode: 'copy'
-
-  input:
-    path gff_files  // List of merged GFF files
-
-  output:
-    path "panaroo_files",                              emit: dir
-    path "results/core_gene_alignment.aln.fasta",      emit: fasta, optional: true
-    path "results/gene_presence_absence.csv",          emit: csv, optional: true
-    path "results/final_graph.gml",                    emit: gml, optional: true
-    path "results/pre_filt_graph.gml",                 emit: gml_alt, optional: true
-
-  script:
-  """
-  set -euo pipefail
-  panaroo -i ${gff_files.join(' ')} -o ${params.outdir} \
-    --clean-mode ${params.panaroo_clean_mode} \
-    --remove-invalid-genes \
-    --alignment core \
-    --aligner mafft \
-    -t ${task.cpus}
-  """
-}
-
 process PANAROO {
   tag "panaroo"
   label 'medium'
@@ -566,11 +562,11 @@ process PANAROO {
     path merged_gff_list
 
   output:
+    path "results",                                    emit: dir
     path "results/core_gene_alignment.aln.fasta",      emit: core_aln, optional: true
     path "results/gene_presence_absence.csv",          emit: roary_like,   optional: true
     path "results/final_graph.gml",                    emit: graph_gml,     optional: true
     path "results/pre_filt_graph.gml",                 emit: graph_gml_alt, optional: true
-    path "results",                                    emit: panaroo_dir,       optional: true
 
   script:
   """

@@ -290,28 +290,27 @@ workflow amr_pangenome_from_assemblies {
   }
 
   main:
-    asm = assemblies
     
     // Assembly evaluation
-    quast = QUAST(asm)
+    //quast = QUAST(asm)
 
     // Summarise Quast results with MultiQC
-    mqc_quast = MULTIQC(quast.report_dir.map { _, d -> d }.collect())
+    //mqc_quast = MULTIQC(quast.report_dir.map { _, d -> d }.collect())
     
     // ABRicate (per sample), tag, merge
-    ab          = ABRICATE(asm)
-    tag_amr     = ABRICATE_TAG_AMR(ab.amr_tsv, 'amr')
-    tag_plm     = ABRICATE_TAG_PLM(ab.plm_tsv, 'plm')
-    merged_amr  = MERGE_ABRICATE_AMR(tag_amr.tagged.collect(), 'amr')
-    merged_plm  = MERGE_ABRICATE_PLM(tag_plm.tagged.collect(), 'plm')
-    abri_all    = ab.amr_tsv.mix(ab.plm_tsv).collect()
-    abri_merged = merged_amr.merged.mix(merged_plm.merged).collect()
-    combined    = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
-    abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined.combined)
+    //ab          = ABRICATE(asm)
+    //tag_amr     = ABRICATE_TAG_AMR(ab.amr_tsv, 'amr')
+    //tag_plm     = ABRICATE_TAG_PLM(ab.plm_tsv, 'plm')
+    //merged_amr  = MERGE_ABRICATE_AMR(tag_amr.tagged.collect(), 'amr')
+    //merged_plm  = MERGE_ABRICATE_PLM(tag_plm.tagged.collect(), 'plm')
+    //abri_all    = ab.amr_tsv.mix(ab.plm_tsv).collect()
+    //abri_merged = merged_amr.merged.mix(merged_plm.merged).collect()
+    //combined    = COMBINE_ABRICATE_RESULTS(merged_amr.merged, merged_plm.merged)
+    //abri_summ_plots = PLOT_SUMMARIZE_ABRICATE(combined.combined)
 
     // MLST (per sample, merge then summarise)
-    mlst       = MLST_CONTIGS_PS(asm)
-    merge_mlst = MERGE_MLST( mlst.mlst_tsv.map{ it[1] }.collect() )
+    //mlst       = MLST_CONTIGS_PS(asm)
+    //merge_mlst = MERGE_MLST( mlst.mlst_tsv.map{ it[1] }.collect() )
 
     // Prepare assemblies channel keyed by sample_id for Panaroo input downstream
     assemblies_keyed = asm
@@ -326,7 +325,7 @@ workflow amr_pangenome_from_assemblies {
     
     // Merge GFF + FASTA for each sample and save the list of merged GFFs
     merged = MERGE_GFF_FASTA(annot_with_asm)
-    merged_gff_list = merged_gff
+    merged_gff_list = merged
       .map { sid, merged_gff -> merged_gff }
       .collectFile(name: 'merged_gff_list.txt')
     
@@ -342,22 +341,23 @@ workflow amr_pangenome_from_assemblies {
     // iq = IQTREE2(pana.fasta)
 
   emit:
-    quast_dir                = quast.report_dir
-    quast_tsv                = quast.report_tsv
-    quast_txt                = quast.report_txt
-    multiqc_report           = mqc_quast.report
-    abricate_amr_per_sample  = ab.amr_tsv
-    abricate_amr_summary     = ab.amr_summary
-    abricate_plm_per_sample  = ab.plm_tsv
-    abricate_plm_summary     = ab.plm_summary
-    abricate_all_per_sample  = abri_all
-    abricate_merged_tsv      = abri_merged
-    abricate_combined        = combined.combined
-    abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
-    per_sample_summary       = abri_summ_plots.per_sample_summary
-    mlst_tsv                 = mlst.mlst_tsv
-    mlst_merged              = merge_mlst.mlst_merged
-    mlst_summary             = merge_mlst.mlst_summary  
+    //quast_dir                = quast.report_dir
+    //quast_tsv                = quast.report_tsv
+    //quast_txt                = quast.report_txt
+    //multiqc_report           = mqc_quast.report
+    //abricate_amr_per_sample  = ab.amr_tsv
+    //abricate_amr_summary     = ab.amr_summary
+    //abricate_plm_per_sample  = ab.plm_tsv
+    //abricate_plm_summary     = ab.plm_summary
+    //abricate_all_per_sample  = abri_all
+    //abricate_merged_tsv      = abri_merged
+    //abricate_combined        = combined.combined
+    //abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
+    //per_sample_summary       = abri_summ_plots.per_sample_summary
+   //mlst_tsv                 = mlst.mlst_tsv
+    //mlst_merged              = merge_mlst.mlst_merged
+    //mlst_summary             = merge_mlst.mlst_summary  
+    emit:
     bakta_gff                = bakta.gff
     bakta_tsv                = bakta.tsv
     bakta_faa                = bakta.faa
@@ -370,11 +370,11 @@ workflow amr_pangenome_from_assemblies {
     bakta_svg                = bakta.svg
     bakta_png                = bakta.png
     bakta_log                = bakta.log
-    panaroo_dir              = pana.results
-    core_aln                 = pana.core_gene_alignment.aln.fasta
-    roary_like               = pana.csv
-    graph_gml                = pana.final_graph.gml
-    graph_gml_alt            = pana.pre_filt_graph.gml
+    panaroo_dir              = pana.dir
+    core_aln                 = pana.core_aln
+    roary_like               = pana.roary_like
+    graph_gml                = pana.graph_gml     
+    graph_gml_alt            = pana.graph_gml_alt
     //panaroo_plots            = pana_plots.all_plots
     //panaroo_plot_png         = pana_plots.plot
 }
