@@ -203,7 +203,7 @@ workflow amr_annotation_from_assemblies {
   if (!params.assemblies) error "Provide --assemblies '<glob>' for this workflow" 
   log.info "assemblies pattern: ${params.assemblies}"
 
-  assemblies = Channel
+  asm = Channel
   .fromPath(params.assemblies, checkIfExists: true)
   .ifEmpty { error "No assemblies matched: ${params.assemblies}" }
   .map { f ->
@@ -215,12 +215,11 @@ workflow amr_annotation_from_assemblies {
 
   main:
 
-    asm = assemblies
     // Assembly evaluation
-    quast = QUAST(asm)
+    //quast = QUAST(asm)
 
     // Summarise Quast results with MultiQC
-    mqc_quast = MULTIQC(quast.report_dir.map { _, d -> d }.collect())
+    //mqc_quast = MULTIQC(quast.report_dir.map { _, d -> d }.collect())
     
     // ABRicate (per sample), tag, merge
     ab          = ABRICATE(asm)
@@ -241,10 +240,10 @@ workflow amr_annotation_from_assemblies {
     //bakta = BAKTA(asm)
 
   emit:
-    quast_dir                = quast.report_dir
-    quast_tsv                = quast.report_tsv
-    quast_txt                = quast.report_txt
-    multiqc_report           = mqc_quast.report
+    //quast_dir                = quast.report_dir
+    //quast_tsv                = quast.report_tsv
+    //quast_txt                = quast.report_txt
+    //multiqc_report           = mqc_quast.report
     abricate_amr_per_sample  = ab.amr_tsv
     abricate_amr_summary     = ab.amr_summary
     abricate_plm_per_sample  = ab.plm_tsv
@@ -254,9 +253,9 @@ workflow amr_annotation_from_assemblies {
     abricate_combined        = combined.combined
     abricate_summary_plots   = abri_summ_plots.abricate_summary_plots
     per_sample_summary       = abri_summ_plots.per_sample_summary
-    mlst_tsv                 = mlst.mlst_tsv
-    mlst_merged              = merge_mlst.mlst_merged
-    mlst_summary             = merge_mlst.mlst_summary  
+    //mlst_tsv                 = mlst.mlst_tsv
+    //mlst_merged              = merge_mlst.mlst_merged
+    //mlst_summary             = merge_mlst.mlst_summary  
     //bakta_gff                = bakta.gff
     //bakta_tsv                = bakta.tsv
     //bakta_faa                = bakta.faa
