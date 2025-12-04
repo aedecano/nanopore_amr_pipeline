@@ -3,7 +3,7 @@
 nextflow.enable.dsl = 2
 
 // Load modules
-include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; MLST_CONTIGS_PS; MERGE_MLST; BAKTA; MERGE_GFF_FASTA; PANAROO; SELECT_PANAROO_GML; PLOT_PANAROO_GML; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY } from './modules/nanopore.nf'
+include { NANOPLOT_RAW; FILTLONG; NANOPLOT_FILT; FLYE; QUAST; BANDAGE_IMAGE; ABRICATE; ABRICATE_TAG as ABRICATE_TAG_AMR; ABRICATE_TAG as ABRICATE_TAG_PLM; MERGE_ABRICATE as MERGE_ABRICATE_AMR; MERGE_ABRICATE as MERGE_ABRICATE_PLM; COMBINE_ABRICATE_RESULTS; PLOT_SUMMARIZE_ABRICATE; MLST_CONTIGS_PS; MERGE_MLST; BAKTA; MERGE_GFF_FASTA; PANAROO; SELECT_PANAROO_GML; PLOT_PANAROO_GML; RAXML_NG; IQTREE2; MULTIQC; KRAKEN2; GTDBTK_CLASSIFY; MOB_RECON } from './modules/nanopore.nf'
 
 
 // ---- Params defaults (DSL2-safe) ----
@@ -479,6 +479,28 @@ workflow assembly_amr_annotation {
     bakta_png                = bakta.png
     bakta_log                = bakta.log
     multiqc_report           = mqc.report
+}
+
+workflow mobsuite_from_assemblies {
+
+  if (!params.assemblies) error "Provide --assemblies '<glob>' for this workflow" 
+  log.info "assemblies pattern: ${params.assemblies}"
+
+  asm = Channel
+  .fromPath(params.assemblies, checkIfExists: true)
+  .ifEmpty { error "No assemblies matched: ${params.assemblies}" }
+  .map { f ->
+    def sid = f.getBaseName()
+      .replaceFirst(/\.fa(sta)?(\.gz)?$/, '')
+      .replaceFirst(/\.fna(\.gz)?$/,      '')
+    tuple(sid, f)
+  }
+
+  main:
+
+    // Mob-suite plasmid reconstruction
+    mob = MOB_RECON(asm)
+    
 }
 
 

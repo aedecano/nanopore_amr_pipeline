@@ -766,3 +766,108 @@ process GTDBTK_CLASSIFY {
   cp -r ${sample_id}_gtdbtk_work/logs ${sample_id}_gtdbtk_logs || true
   """
 }
+
+process MOB_RECON {
+    tag "${sample_id}"
+    label 'medium'
+    publishDir "${params.outdir}/mob-recon", mode: 'copy'
+
+    input:
+    tuple val(sample_id), path(assembly)
+
+    output:
+    tuple val(sample_id), path("${sample_id}_mob_out")
+
+    script:
+  """
+    echo "===== Running MOB-suite for ${sample_id} ====="
+  # Decide input file: if gzipped, decompress to plain FASTA
+    INFASTA="${sample_id}.fa"
+
+  if [[ "${assembly}" == *.gz ]]; then
+    echo "Decompressing ${assembly} -> \$INFASTA"
+    gunzip -c "${assembly}" > "\$INFASTA"
+  else
+    echo "Copying ${assembly} -> \$INFASTA"
+    cp "${assembly}" "\$INFASTA"
+  fi
+
+  mkdir ${sample_id}_mob_out
+
+    mob_recon \\
+    --infile "\$INFASTA" \\
+    --outdir ${sample_id}_mob_out \\
+    --num_threads ${task.cpus} \\
+    --force
+  """
+}
+
+
+process MOB_SUITE_COLLECT {
+    tag "${sample_id}"
+    label 'medium'
+
+    conda """
+        channels:
+          - conda-forge
+          - bioconda
+          - defaults
+        dependencies:
+          - mob_suite=3.1.9
+          - blast
+          - mash
+          - r-base
+          - r-tidyverse
+          - r-janitor
+          - r-argparse
+          - r-stringr
+          - r-viridis
+    """
+
+    publishDir "results/${sample_id}", mode: 'copy'
+
+    input:
+    tuple val(sample_id), path(assembly), path(abricate_tsv)
+    path (merge_script)
+    path (burden_script)
+    path (heatmap_script)
+
+    output:
+    tuple val(sample_id),
+          path("${sample_id}_mob_out"),
+          path("${sample_id}_abricate_mob_merged.tsv"),
+          path("${sample_id}_plasmid_amr_burden.tsv"),
+          path("${sample_id}_plasmid_chromosome_heatmap.png")
+
+    script:
+    """
+    echo "===== Running MOB-suite for ${sample_id} ====="
+
+    mkdir ${sample_id}_mob_out
+
+    mob_recon \\
+        --infile ${assembly} \\
+        --outdir ${sample_id}_mob_out \\
+        --num_threads ${task.cpus} \\
+        --force
+
+    echo "===== Merging MOB-suite + Abricate for ${sample_id} ====="
+
+    Rscript ${merge_script} \\
+        ${sample_id}_mob_out/contig_report.txt \\
+        ${abricate_tsv} \\
+        ${sample_id}
+
+    echo "===== Generating plasmid-level AMR burden for ${sample_id} ====="
+
+    Rscript ${burden_script} \\
+        ${sample_id}_abricate_mob_merged.tsv \\
+        ${sample_id}
+
+    echo "===== Making heatmap for ${sample_id} ====="
+
+    Rscript ${heatmap_script} \\
+        ${sample_id}_abricate_mob_merged.tsv \\
+        ${sample_id}_plasmid_chromosome_heatmap.png
+    """
+}
