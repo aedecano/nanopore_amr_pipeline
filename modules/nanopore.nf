@@ -480,7 +480,7 @@ process BAKTA {
 
 process MERGE_GFF_FASTA {
   tag "${sample_id}"
-  label 'small'
+  label 'light'
   publishDir "${params.outdir}/merged_gff_fasta", mode: 'copy'
   
   input:
