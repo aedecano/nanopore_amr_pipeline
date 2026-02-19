@@ -1,0 +1,258 @@
+Dec-05 09:43:23.332 [main] DEBUG nextflow.cli.Launcher - $> nextflow run ./main.nf -entry mobsuite_from_assemblies --assemblies '/Users/arundecano/ExtremeSSD/SGUL_files/Enterococcus_analysis_global/Efaecium_urine/*contigs.fa.gz' --outdir '/Volumes/Extreme SSD/SGUL_files/Enterococcus_analysis_global/NF_Entero_urine_mob-recon' -resume
+Dec-05 09:43:23.508 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.7
+Dec-05 09:43:23.522 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/Users/arundecano/.nextflow/plugins; core-plugins: nf-amazon@2.15.0-patch1,nf-azure@1.16.0-patch1,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.1,nf-k8s@1.0.0,nf-tower@1.11.4-patch1,nf-wave@1.12.1
+Dec-05 09:43:23.544 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Dec-05 09:43:23.544 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Dec-05 09:43:23.545 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Dec-05 09:43:23.551 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Dec-05 09:43:23.559 [main] DEBUG nextflow.config.ConfigBuilder - Found config local: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/nextflow.config
+Dec-05 09:43:23.560 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/nextflow.config
+Dec-05 09:43:23.572 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /Users/arundecano/.nextflow/secrets/store.json
+Dec-05 09:43:23.574 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@187eb9a8] - activable => nextflow.secret.LocalSecretsProvider@187eb9a8
+Dec-05 09:43:23.579 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Dec-05 09:43:23.867 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Dec-05 09:43:23.876 [main] DEBUG nextflow.cli.CmdRun - Launching `./main.nf` [voluminous_pesquet] DSL2 - revision: 7498b42c45
+Dec-05 09:43:23.876 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Dec-05 09:43:23.876 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Dec-05 09:43:23.901 [main] DEBUG nextflow.Session - Session UUID: 53e90d65-3276-4e2b-b5a5-77ece717bd61
+Dec-05 09:43:23.901 [main] DEBUG nextflow.Session - Run name: voluminous_pesquet
+Dec-05 09:43:23.901 [main] DEBUG nextflow.Session - Executor pool size: 10
+Dec-05 09:43:23.905 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Dec-05 09:43:23.907 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=30; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Dec-05 09:43:28.926 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.04.7 build 5955
+  Created: 08-09-2025 13:29 UTC (14:29 BST)
+  System: Mac OS X 15.6.1
+  Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 24.0.2+12
+  Encoding: UTF-8 (UTF-8)
+  Process: 33666@Aruns-MacBook-Air.local [192.168.0.77]
+  CPUs: 10 - Mem: 24 GB (109.6 MB) - Swap: 13 GB (977.4 MB)
+Dec-05 09:43:28.969 [main] DEBUG nextflow.Session - Work-dir: /Users/arundecano/nxf_work [Mac OS X]
+Dec-05 09:43:28.970 [main] DEBUG nextflow.Session - Script base path does not exist or is not a directory: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/bin
+Dec-05 09:43:28.976 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Dec-05 09:43:28.980 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Dec-05 09:43:28.990 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Dec-05 09:43:29.000 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Dec-05 09:43:29.004 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 11; maxThreads: 1000
+Dec-05 09:43:29.043 [main] DEBUG nextflow.Session - Session start
+Dec-05 09:43:29.045 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow started -- trace file: /Volumes/Extreme SSD/SGUL_files/Enterococcus_analysis_global/NF_Entero_urine_mob-recon/pipeline_trace.txt
+Dec-05 09:43:29.325 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Dec-05 09:43:29.621 [main] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `help` -- Initialise it to a default value eg. `params.help = some_value`
+Dec-05 09:43:29.638 [main] INFO  nextflow.Nextflow - assemblies pattern: /Users/arundecano/ExtremeSSD/SGUL_files/Enterococcus_analysis_global/Efaecium_urine/*contigs.fa.gz
+Dec-05 09:43:29.691 [main] DEBUG nextflow.script.ProcessConfig - Config settings `withLabel:medium` matches labels `medium` for process with name mobsuite_from_assemblies:MOB_RECON
+Dec-05 09:43:29.696 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: local
+Dec-05 09:43:29.696 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Dec-05 09:43:29.698 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Dec-05 09:43:29.701 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=10; memory=24 GB; capacity=10; pollInterval=100ms; dumpInterval=5m
+Dec-05 09:43:29.702 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Dec-05 09:43:29.710 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'mobsuite_from_assemblies:MOB_RECON': maxForks=4; fair=false; array=0
+Dec-05 09:43:29.722 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: ABRICATE_TAG_PLM, SELECT_PANAROO_GML, MLST_CONTIGS_PS, PANAROO, IQTREE2, MULTIQC, MERGE_ABRICATE, PLOT_SUMMARIZE_ABRICATE, RAXML_NG, mobsuite_from_assemblies:MOB_RECON, BAKTA, GTDBTK_CLASSIFY, PLOT_PANAROO_GML, NANOPLOT_RAW, MOB_RECON, MOB_SUITE_COLLECT, QUAST, MERGE_MLST, MERGE_ABRICATE_AMR, MLST_CONTIGS_PS_0, FILTLONG, ABRICATE_TAG, NANOPLOT_FILT, KRAKEN2, FLYE, MERGE_ABRICATE_PLM, COMBINE_ABRICATE_RESULTS, MERGE_GFF_FASTA, ABRICATE, ABRICATE_TAG_AMR, BANDAGE_IMAGE
+Dec-05 09:43:29.723 [main] DEBUG nextflow.Session - Igniting dataflow network (2)
+Dec-05 09:43:29.726 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > mobsuite_from_assemblies:MOB_RECON
+Dec-05 09:43:29.726 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_a00426462e71fa76: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/main.nf
+  Script_fa866394ced7dcf7: /Users/arundecano/Documents/Github_aedecano_repos/nanopore_amr_pipeline/modules/nanopore.nf
+Dec-05 09:43:29.726 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Dec-05 09:43:29.726 [main] DEBUG nextflow.Session - Session await
+Dec-05 09:43:29.726 [PathVisitor-1] DEBUG nextflow.file.PathVisitor - files for syntax: glob; folder: /Users/arundecano/ExtremeSSD/SGUL_files/Enterococcus_analysis_global/Efaecium_urine/; pattern: *contigs.fa.gz; options: [checkIfExists:true]
+Dec-05 09:43:29.814 [Actor Thread 3] INFO  nextflow.processor.TaskProcessor - [17/d65f29] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4052467.contigs)
+Dec-05 09:43:29.814 [Actor Thread 12] INFO  nextflow.processor.TaskProcessor - [39/bae0c1] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4052472.contigs)
+Dec-05 09:43:29.814 [Actor Thread 7] INFO  nextflow.processor.TaskProcessor - [49/2c785c] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4052458.contigs)
+Dec-05 09:43:29.814 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [d5/91cb8d] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA3614302.contigs)
+Dec-05 09:43:29.814 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [1e/f9f615] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA104415088.contigs)
+Dec-05 09:43:29.814 [Actor Thread 4] INFO  nextflow.processor.TaskProcessor - [78/7c5770] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4052459.contigs)
+Dec-05 09:43:29.814 [Actor Thread 1] INFO  nextflow.processor.TaskProcessor - [36/7ba837] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4052471.contigs)
+Dec-05 09:43:29.814 [Actor Thread 5] INFO  nextflow.processor.TaskProcessor - [35/c2cbda] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA2637565.contigs)
+Dec-05 09:43:29.814 [Actor Thread 2] INFO  nextflow.processor.TaskProcessor - [32/3a3e92] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4052468.contigs)
+Dec-05 09:43:29.814 [Actor Thread 8] INFO  nextflow.processor.TaskProcessor - [ba/2d767c] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA2637592.contigs)
+Dec-05 09:43:29.831 [Actor Thread 4] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'PublishDir' minSize=10; maxSize=30; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Dec-05 09:43:29.837 [Actor Thread 2] INFO  nextflow.processor.TaskProcessor - [b0/825625] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4775476.contigs)
+Dec-05 09:43:29.837 [Actor Thread 12] INFO  nextflow.processor.TaskProcessor - [28/7f0d67] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4052473.contigs)
+Dec-05 09:43:29.838 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [e3/28b427] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4775538.contigs)
+Dec-05 09:43:29.838 [Actor Thread 1] INFO  nextflow.processor.TaskProcessor - [f9/785eae] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN00779835.contigs)
+Dec-05 09:43:29.839 [Actor Thread 7] INFO  nextflow.processor.TaskProcessor - [27/1ec5a3] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4775536.contigs)
+Dec-05 09:43:29.839 [Actor Thread 4] INFO  nextflow.processor.TaskProcessor - [ff/229091] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4775480.contigs)
+Dec-05 09:43:29.839 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [5f/55f2e2] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN00779829.contigs)
+Dec-05 09:43:29.839 [Actor Thread 3] INFO  nextflow.processor.TaskProcessor - [9b/e7aa25] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMEA4775542.contigs)
+Dec-05 09:43:29.845 [Actor Thread 12] INFO  nextflow.processor.TaskProcessor - [43/153dca] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN04498638.contigs)
+Dec-05 09:43:29.846 [Actor Thread 3] INFO  nextflow.processor.TaskProcessor - [1d/d50627] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141321.contigs)
+Dec-05 09:43:29.846 [Actor Thread 5] INFO  nextflow.processor.TaskProcessor - [89/c1035a] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN04498599.contigs)
+Dec-05 09:43:29.846 [Actor Thread 9] INFO  nextflow.processor.TaskProcessor - [85/a6f8ed] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN04498572.contigs)
+Dec-05 09:43:29.846 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [f4/d64a7b] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN04498607.contigs)
+Dec-05 09:43:29.846 [Actor Thread 13] INFO  nextflow.processor.TaskProcessor - [e9/2a42f9] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN04498665.contigs)
+Dec-05 09:43:29.847 [Actor Thread 7] INFO  nextflow.processor.TaskProcessor - [95/716f29] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN04498640.contigs)
+Dec-05 09:43:29.848 [Actor Thread 8] INFO  nextflow.processor.TaskProcessor - [50/0e63fa] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141329.contigs)
+Dec-05 09:43:29.850 [Actor Thread 14] INFO  nextflow.processor.TaskProcessor - [a0/204683] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141333.contigs)
+Dec-05 09:43:29.851 [Actor Thread 2] INFO  nextflow.processor.TaskProcessor - [a6/e173ff] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141330.contigs)
+Dec-05 09:43:29.854 [Actor Thread 4] INFO  nextflow.processor.TaskProcessor - [94/0d3e39] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141336.contigs)
+Dec-05 09:43:29.854 [Actor Thread 12] INFO  nextflow.processor.TaskProcessor - [13/4e3e5b] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141335.contigs)
+Dec-05 09:43:29.855 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [5a/d64bcd] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141343.contigs)
+Dec-05 09:43:29.856 [Actor Thread 5] INFO  nextflow.processor.TaskProcessor - [78/ac8465] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141337.contigs)
+Dec-05 09:43:29.857 [Actor Thread 7] INFO  nextflow.processor.TaskProcessor - [40/a3785d] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141342.contigs)
+Dec-05 09:43:29.857 [Actor Thread 13] INFO  nextflow.processor.TaskProcessor - [be/907fda] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141341.contigs)
+Dec-05 09:43:29.857 [Actor Thread 2] INFO  nextflow.processor.TaskProcessor - [69/19cee8] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141351.contigs)
+Dec-05 09:43:29.857 [Actor Thread 8] INFO  nextflow.processor.TaskProcessor - [a0/90b8d3] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141358.contigs)
+Dec-05 09:43:29.858 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [5a/7b1b3b] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141360.contigs)
+Dec-05 09:43:29.857 [Actor Thread 3] INFO  nextflow.processor.TaskProcessor - [eb/1ab151] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141357.contigs)
+Dec-05 09:43:29.862 [Actor Thread 4] INFO  nextflow.processor.TaskProcessor - [55/fd426d] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141363.contigs)
+Dec-05 09:43:29.862 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [52/62c287] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141361.contigs)
+Dec-05 09:43:29.871 [Actor Thread 12] INFO  nextflow.processor.TaskProcessor - [15/a4cb23] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141371.contigs)
+Dec-05 09:43:29.873 [Actor Thread 9] INFO  nextflow.processor.TaskProcessor - [f9/1b2f20] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141387.contigs)
+Dec-05 09:43:29.873 [Actor Thread 14] INFO  nextflow.processor.TaskProcessor - [e2/a9851f] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141380.contigs)
+Dec-05 09:43:29.873 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [79/af1680] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141384.contigs)
+Dec-05 09:43:29.877 [Actor Thread 5] INFO  nextflow.processor.TaskProcessor - [31/a4f91d] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141385.contigs)
+Dec-05 09:43:29.877 [Actor Thread 1] INFO  nextflow.processor.TaskProcessor - [f3/c35759] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141377.contigs)
+Dec-05 09:43:29.877 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [b5/9cd50f] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141391.contigs)
+Dec-05 09:43:29.877 [Actor Thread 2] INFO  nextflow.processor.TaskProcessor - [08/cc68a4] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141389.contigs)
+Dec-05 09:43:29.879 [Actor Thread 8] INFO  nextflow.processor.TaskProcessor - [f0/7517ee] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141388.contigs)
+Dec-05 09:43:29.880 [Actor Thread 4] INFO  nextflow.processor.TaskProcessor - [23/97559a] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141390.contigs)
+Dec-05 09:43:29.880 [Actor Thread 7] INFO  nextflow.processor.TaskProcessor - [99/5d79ba] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141392.contigs)
+Dec-05 09:43:29.881 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [d2/fda31c] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141395.contigs)
+Dec-05 09:43:29.881 [Actor Thread 14] INFO  nextflow.processor.TaskProcessor - [a2/4e980e] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141394.contigs)
+Dec-05 09:43:29.881 [Actor Thread 3] INFO  nextflow.processor.TaskProcessor - [d0/ad8c01] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141396.contigs)
+Dec-05 09:43:29.884 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [90/4099ff] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141408.contigs)
+Dec-05 09:43:29.884 [Actor Thread 13] INFO  nextflow.processor.TaskProcessor - [cb/318b94] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141402.contigs)
+Dec-05 09:43:29.886 [Actor Thread 5] INFO  nextflow.processor.TaskProcessor - [b3/4f1950] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141417.contigs)
+Dec-05 09:43:29.918 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [00/245ed3] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141421.contigs)
+Dec-05 09:43:29.919 [Actor Thread 9] INFO  nextflow.processor.TaskProcessor - [65/acc878] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141416.contigs)
+Dec-05 09:43:29.919 [Actor Thread 2] INFO  nextflow.processor.TaskProcessor - [82/cce5b5] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141415.contigs)
+Dec-05 09:43:29.919 [Actor Thread 5] INFO  nextflow.processor.TaskProcessor - [3f/01ee6a] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141426.contigs)
+Dec-05 09:43:29.923 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [c5/52010d] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141422.contigs)
+Dec-05 09:43:29.924 [Actor Thread 3] INFO  nextflow.processor.TaskProcessor - [01/95ad57] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141427.contigs)
+Dec-05 09:43:29.924 [Actor Thread 4] INFO  nextflow.processor.TaskProcessor - [1e/02b5ed] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141425.contigs)
+Dec-05 09:43:29.924 [Actor Thread 8] INFO  nextflow.processor.TaskProcessor - [96/bced72] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141423.contigs)
+Dec-05 09:43:29.924 [Actor Thread 13] INFO  nextflow.processor.TaskProcessor - [1e/63a0ce] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141424.contigs)
+Dec-05 09:43:29.924 [Actor Thread 1] INFO  nextflow.processor.TaskProcessor - [cf/a51803] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141428.contigs)
+Dec-05 09:43:29.927 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [fe/a12d5f] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141432.contigs)
+Dec-05 09:43:29.927 [Actor Thread 2] INFO  nextflow.processor.TaskProcessor - [cd/f36919] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141434.contigs)
+Dec-05 09:43:29.929 [Actor Thread 5] INFO  nextflow.processor.TaskProcessor - [81/9fea7c] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141433.contigs)
+Dec-05 09:43:29.930 [Actor Thread 9] INFO  nextflow.processor.TaskProcessor - [ac/ea5ec4] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141431.contigs)
+Dec-05 09:43:29.930 [Actor Thread 3] INFO  nextflow.processor.TaskProcessor - [92/d98bef] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141462.contigs)
+Dec-05 09:43:29.930 [Actor Thread 6] INFO  nextflow.processor.TaskProcessor - [67/c2790e] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141465.contigs)
+Dec-05 09:43:29.933 [Actor Thread 10] INFO  nextflow.processor.TaskProcessor - [ac/91cf7e] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141479.contigs)
+Dec-05 09:43:29.934 [Actor Thread 12] INFO  nextflow.processor.TaskProcessor - [21/6b3129] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141435.contigs)
+Dec-05 09:43:29.934 [Actor Thread 1] INFO  nextflow.processor.TaskProcessor - [1a/e952a8] Cached process > mobsuite_from_assemblies:MOB_RECON (SAMN07141472.contigs)
+Dec-05 09:43:29.955 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:43:29.962 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:43:29.963 [Task submitter] INFO  nextflow.Session - [3a/2e1d91] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141475.contigs)
+Dec-05 09:43:46.632 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 78; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141475.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/3a/2e1d915cdda537b92af077165de211]
+Dec-05 09:43:46.633 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=30; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Dec-05 09:43:46.636 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:43:46.637 [Task submitter] INFO  nextflow.Session - [92/8a2920] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141485.contigs)
+Dec-05 09:43:59.407 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 81; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141485.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/92/8a292070f7fbe13cebc647fd52cbfb]
+Dec-05 09:43:59.411 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:43:59.411 [Task submitter] INFO  nextflow.Session - [11/15dd67] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141481.contigs)
+Dec-05 09:44:14.586 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 80; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141481.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/11/15dd678a269b6d50c887a568e3b8ef]
+Dec-05 09:44:14.588 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:44:14.589 [Task submitter] INFO  nextflow.Session - [df/0bf59c] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141476.contigs)
+Dec-05 09:44:25.641 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 79; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141476.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/df/0bf59c97fe75e6a45ec9ce4003fc97]
+Dec-05 09:44:25.644 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:44:25.644 [Task submitter] INFO  nextflow.Session - [59/836613] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141468.contigs)
+Dec-05 09:44:40.047 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 75; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141468.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/59/836613bcfc606efc61c06fd65974ce]
+Dec-05 09:44:40.048 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:44:40.050 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:44:40.050 [Task submitter] INFO  nextflow.Session - [32/532ac8] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141510.contigs)
+Dec-05 09:44:56.605 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 82; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141510.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/32/532ac80cbf678ae0b80e1b3a8507e7]
+Dec-05 09:44:56.609 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:44:56.609 [Task submitter] INFO  nextflow.Session - [eb/0121df] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141512.contigs)
+Dec-05 09:45:11.288 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 83; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141512.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/eb/0121df5ad18ec24faf6effad470f22]
+Dec-05 09:45:11.290 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:45:11.290 [Task submitter] INFO  nextflow.Session - [50/020868] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141509.contigs)
+Dec-05 09:45:26.462 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 84; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141509.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/50/020868b95464b3e77a67b58f7d259d]
+Dec-05 09:45:26.465 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:45:26.465 [Task submitter] INFO  nextflow.Session - [4e/bc8008] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141513.contigs)
+Dec-05 09:45:41.748 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 86; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141513.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/4e/bc8008a428c8d07b96630b355a6efe]
+Dec-05 09:45:41.750 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:45:41.752 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:45:41.753 [Task submitter] INFO  nextflow.Session - [39/3f0c8d] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141487.contigs)
+Dec-05 09:46:07.349 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 85; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141487.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/39/3f0c8d785630c52d9349e3bf69f07e]
+Dec-05 09:46:07.357 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:46:07.357 [Task submitter] INFO  nextflow.Session - [3f/1dba37] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141520.contigs)
+Dec-05 09:46:23.149 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 87; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141520.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/3f/1dba37185cf66ce8f42f17c2262e7d]
+Dec-05 09:46:23.152 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:46:23.152 [Task submitter] INFO  nextflow.Session - [44/cbd2b8] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141521.contigs)
+Dec-05 09:46:38.604 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 89; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141521.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/44/cbd2b857647e1d4b0b55a5ef563fd8]
+Dec-05 09:46:38.607 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:46:38.607 [Task submitter] INFO  nextflow.Session - [b5/0ab74f] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141514.contigs)
+Dec-05 09:46:55.765 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 88; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141514.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/b5/0ab74f56711b57083483a273fb8062]
+Dec-05 09:46:55.767 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:46:55.769 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:46:55.769 [Task submitter] INFO  nextflow.Session - [53/069165] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141525.contigs)
+Dec-05 09:47:11.883 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 91; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141525.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/53/069165f806b8df40e1beacefb31eea]
+Dec-05 09:47:11.886 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:47:11.886 [Task submitter] INFO  nextflow.Session - [bf/c4181c] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141526.contigs)
+Dec-05 09:47:26.217 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 92; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141526.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/bf/c4181c7c53081e6f49197559a1774c]
+Dec-05 09:47:26.219 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:47:26.219 [Task submitter] INFO  nextflow.Session - [2d/2e0a57] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141524.contigs)
+Dec-05 09:47:41.404 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 90; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141524.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/2d/2e0a57edeec434de744fba30835ca1]
+Dec-05 09:47:41.406 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:47:41.406 [Task submitter] INFO  nextflow.Session - [7e/c2a152] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141527.contigs)
+Dec-05 09:47:56.297 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 93; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141527.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/7e/c2a152a1cad5a9b5e262468cf3264d]
+Dec-05 09:47:56.298 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:47:56.299 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:47:56.299 [Task submitter] INFO  nextflow.Session - [b8/9f4ed5] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141528.contigs)
+Dec-05 09:48:14.508 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 94; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141528.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/b8/9f4ed5981c3b03f136f89f039f84fc]
+Dec-05 09:48:14.511 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:48:14.511 [Task submitter] INFO  nextflow.Session - [4c/398f44] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141531.contigs)
+Dec-05 09:48:29.049 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 95; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141531.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/4c/398f44b51fa8f89077f53d2ab30f4b]
+Dec-05 09:48:29.051 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:48:29.051 [Task submitter] INFO  nextflow.Session - [3a/c71497] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141550.contigs)
+Dec-05 09:48:29.884 [Task monitor] DEBUG n.processor.TaskPollingMonitor - !! executor local > tasks to be completed: 1 -- submitted tasks are shown below
+~> TaskHandler[id: 97; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141550.contigs); status: RUNNING; exit: -; error: -; workDir: /Users/arundecano/nxf_work/3a/c71497dee5c33552fe9db542ddbe13]
+Dec-05 09:48:30.057 [Task submitter] DEBUG n.processor.TaskPollingMonitor - %% executor local > tasks in the submission queue: 10 -- tasks to be submitted are shown below
+~> TaskHandler[id: 96; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141532.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/2f/e4e78eb29b457d425c00a9774d6111]
+~> TaskHandler[id: 98; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141567.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/1e/2f9a60991a975313895bf5023fce50]
+~> TaskHandler[id: 99; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141556.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/51/8ee11e2098d6e7a5e36683032fd68e]
+~> TaskHandler[id: 100; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141533.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/df/5437cd8443f22cb28659d0ee4fb670]
+~> TaskHandler[id: 101; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141573.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/2d/21495896bebd11b50d6b1ef97905b4]
+~> TaskHandler[id: 102; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141574.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/47/ee95704e10c554de768fd7035b943d]
+~> TaskHandler[id: 103; name: mobsuite_from_assemblies:MOB_RECON (SAMN08329297.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/22/1e4c1ebbb429c143c7e29407aff3fa]
+~> TaskHandler[id: 105; name: mobsuite_from_assemblies:MOB_RECON (SAMN08329302.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/d0/f9346e8e336e25dd56eeaf6cb2accf]
+~> TaskHandler[id: 106; name: mobsuite_from_assemblies:MOB_RECON (SAMN09475465.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/98/90bc13868ad40da16796af6772e34f]
+~> TaskHandler[id: 104; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141576.contigs); status: NEW; exit: -; error: -; workDir: /Users/arundecano/nxf_work/28/400785ce75e1f0cbe628e90129ac0f]
+Dec-05 09:48:43.148 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 97; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141550.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/3a/c71497dee5c33552fe9db542ddbe13]
+Dec-05 09:48:43.150 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:48:43.150 [Task submitter] INFO  nextflow.Session - [2f/e4e78e] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141532.contigs)
+Dec-05 09:48:58.252 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 96; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141532.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/2f/e4e78eb29b457d425c00a9774d6111]
+Dec-05 09:48:58.254 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:48:58.256 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:48:58.256 [Task submitter] INFO  nextflow.Session - [1e/2f9a60] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141567.contigs)
+Dec-05 09:49:12.891 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 98; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141567.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/1e/2f9a60991a975313895bf5023fce50]
+Dec-05 09:49:12.894 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:49:12.894 [Task submitter] INFO  nextflow.Session - [51/8ee11e] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141556.contigs)
+Dec-05 09:49:29.128 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 99; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141556.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/51/8ee11e2098d6e7a5e36683032fd68e]
+Dec-05 09:49:29.131 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:49:29.131 [Task submitter] INFO  nextflow.Session - [df/5437cd] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141533.contigs)
+Dec-05 09:49:44.088 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 100; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141533.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/df/5437cd8443f22cb28659d0ee4fb670]
+Dec-05 09:49:44.090 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:49:44.090 [Task submitter] INFO  nextflow.Session - [2d/214958] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141573.contigs)
+Dec-05 09:49:59.475 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 101; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141573.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/2d/21495896bebd11b50d6b1ef97905b4]
+Dec-05 09:49:59.476 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:49:59.478 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:49:59.478 [Task submitter] INFO  nextflow.Session - [47/ee9570] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141574.contigs)
+Dec-05 09:50:17.691 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 102; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141574.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/47/ee95704e10c554de768fd7035b943d]
+Dec-05 09:50:17.693 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:50:17.693 [Task submitter] INFO  nextflow.Session - [22/1e4c1e] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN08329297.contigs)
+Dec-05 09:50:32.776 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 103; name: mobsuite_from_assemblies:MOB_RECON (SAMN08329297.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/22/1e4c1ebbb429c143c7e29407aff3fa]
+Dec-05 09:50:32.781 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:50:32.781 [Task submitter] INFO  nextflow.Session - [d0/f9346e] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN08329302.contigs)
+Dec-05 09:50:51.211 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 105; name: mobsuite_from_assemblies:MOB_RECON (SAMN08329302.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/d0/f9346e8e336e25dd56eeaf6cb2accf]
+Dec-05 09:50:51.218 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:50:51.218 [Task submitter] INFO  nextflow.Session - [98/90bc13] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN09475465.contigs)
+Dec-05 09:51:07.417 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 106; name: mobsuite_from_assemblies:MOB_RECON (SAMN09475465.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/98/90bc13868ad40da16796af6772e34f]
+Dec-05 09:51:07.419 [Task submitter] WARN  n.executor.BashWrapperBuilder - Task runtime metrics are not reported when using macOS without a container engine
+Dec-05 09:51:07.421 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Dec-05 09:51:07.421 [Task submitter] INFO  nextflow.Session - [28/400785] Submitted process > mobsuite_from_assemblies:MOB_RECON (SAMN07141576.contigs)
+Dec-05 09:51:25.874 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 104; name: mobsuite_from_assemblies:MOB_RECON (SAMN07141576.contigs); status: COMPLETED; exit: 0; error: -; workDir: /Users/arundecano/nxf_work/28/400785ce75e1f0cbe628e90129ac0f]
+Dec-05 09:51:25.887 [main] DEBUG nextflow.Session - Session await > all processes finished
+Dec-05 09:51:25.976 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Dec-05 09:51:25.977 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Dec-05 09:51:25.979 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Dec-05 09:51:25.979 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'PublishDir' shutdown completed (hard=false)
+Dec-05 09:51:25.983 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=30; failedCount=0; ignoredCount=0; cachedCount=76; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=1h 3m 28s; failedDuration=0ms; cachedDuration=2h 42m 24s;loadCpus=0; loadMemory=0; peakRunning=1; peakCpus=8; peakMemory=16 GB; ]
+Dec-05 09:51:25.983 [main] DEBUG nextflow.trace.TraceFileObserver - Workflow completed -- saving trace file
+Dec-05 09:51:25.984 [main] DEBUG nextflow.trace.ReportObserver - Workflow completed -- rendering execution report
+Dec-05 09:51:26.544 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
+Dec-05 09:51:26.781 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Dec-05 09:51:26.812 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Dec-05 09:51:26.812 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
